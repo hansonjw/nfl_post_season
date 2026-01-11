@@ -1,0 +1,22 @@
+# GitHub Configuration
+github_owner = "your-github-username"
+github_repo  = "nfl-post-season"
+github_token = "ghp_your_github_personal_access_token"
+
+# Application Configuration
+admin_emails = [
+  "your-email@gmail.com"
+]
+
+google_client_id     = "your-google-client-id.apps.googleusercontent.com"
+google_client_secret = "your-google-client-secret"
+
+allowed_origins = [
+  "https://yourdomain.com",
+  "http://localhost:5173"
+]
+
+# AWS Configuration
+aws_region = "us-east-1"
+
+

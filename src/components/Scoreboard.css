@@ -1,0 +1,182 @@
+.scoreboard {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.scoreboard h2 {
+  margin: 0 0 1.5rem 0;
+  font-size: 2rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.scoreboard-table-container {
+  overflow-x: auto;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scoreboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+.scoreboard-table thead {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.scoreboard-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.scoreboard-table th.rank-col {
+  width: 60px;
+  text-align: center;
+}
+
+.scoreboard-table th.player-col {
+  min-width: 150px;
+}
+
+.scoreboard-table th.correct-col,
+.scoreboard-table th.total-col,
+.scoreboard-table th.percentage-col {
+  width: 100px;
+  text-align: center;
+}
+
+.scoreboard-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background-color 0.2s;
+}
+
+.scoreboard-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.scoreboard-table tbody tr.winner {
+  background: rgba(255, 215, 0, 0.15);
+  border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.scoreboard-table tbody tr.winner:hover {
+  background: rgba(255, 215, 0, 0.2);
+}
+
+.scoreboard-table td {
+  padding: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.scoreboard-table td.rank-col {
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.scoreboard-table td.player-col {
+  font-weight: 500;
+}
+
+.player-name {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.scoreboard-table td.correct-col,
+.scoreboard-table td.total-col,
+.scoreboard-table td.percentage-col {
+  text-align: center;
+}
+
+.percentage-value {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: rgba(100, 200, 255, 0.2);
+  border-radius: 4px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.scoreboard-table tbody tr.winner .percentage-value {
+  background: rgba(255, 215, 0, 0.3);
+  color: rgba(255, 255, 255, 1);
+}
+
+.scoreboard-footer {
+  margin-top: 1rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.875rem;
+}
+
+.scoreboard-loading,
+.scoreboard-error,
+.scoreboard-empty {
+  text-align: center;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scoreboard-loading p,
+.scoreboard-empty p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+}
+
+.scoreboard-error {
+  color: rgba(255, 100, 100, 0.9);
+}
+
+.scoreboard-error button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.scoreboard-error button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .scoreboard-table {
+    font-size: 0.875rem;
+  }
+
+  .scoreboard-table th,
+  .scoreboard-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .scoreboard-table th.rank-col {
+    width: 40px;
+  }
+
+  .scoreboard-table th.player-col {
+    min-width: 120px;
+  }
+
+  .scoreboard h2 {
+    font-size: 1.5rem;
+  }
+}
+

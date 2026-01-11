@@ -1,0 +1,18 @@
+aws_region = "us-east-1"
+project_name = "nfl-post-season"
+
+# Add your admin email(s) here
+admin_emails = [
+  "your-email@gmail.com"
+]
+
+# Google OAuth credentials (get from Google Cloud Console)
+google_client_id = "your-google-client-id.apps.googleusercontent.com"
+google_client_secret = "your-google-client-secret"
+
+# Allowed CORS origins (update with your frontend domain)
+allowed_origins = [
+  "http://localhost:5173",
+  "https://your-domain.com"
+]
+

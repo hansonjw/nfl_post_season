@@ -1,0 +1,58 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo "Installing dependencies..."
+      - npm install -g npm@latest
+      - |
+        cd lambda/shared
+        npm install
+        npm run build
+  build:
+    commands:
+      - echo "Building Lambda functions..."
+      - |
+        cd lambda/read-api
+        npm install
+        npx tsc
+        # Copy shared code
+        mkdir -p dist/../shared
+        cp -r ../shared/dist/* dist/../shared/
+        # Install production deps
+        cp package.json dist/
+        cd dist
+        npm install --production --no-save || true
+        cd ..
+        # Create zip
+        cd dist
+        zip -r index.zip . -q
+        cd ../..
+      - |
+        cd lambda/admin-api
+        npm install
+        npx tsc
+        # Copy shared code
+        mkdir -p dist/../shared
+        cp -r ../shared/dist/* dist/../shared/
+        # Install production deps
+        cp package.json dist/
+        cd dist
+        npm install --production --no-save || true
+        cd ..
+        # Create zip
+        cd dist
+        zip -r index.zip . -q
+        cd ../..
+  post_build:
+    commands:
+      - echo "Build completed successfully"
+      - ls -lh lambda/*/dist/*.zip
+
+artifacts:
+  files:
+    - lambda/read-api/dist/index.zip
+    - lambda/admin-api/dist/index.zip
+  name: lambda-build-artifacts
+
+

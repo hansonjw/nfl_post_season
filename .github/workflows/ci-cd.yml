@@ -1,0 +1,167 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: # Allow manual triggers
+
+env:
+  AWS_REGION: us-east-1
+  NODE_VERSION: '20'
+
+jobs:
+  # Build and test Lambda functions
+  build-lambdas:
+    name: Build Lambda Functions
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: |
+            lambda/shared/package-lock.json
+            lambda/read-api/package-lock.json
+            lambda/admin-api/package-lock.json
+      
+      - name: Install zip
+        run: sudo apt-get update && sudo apt-get install -y zip
+      
+      - name: Build Lambda functions
+        run: |
+          cd lambda
+          chmod +x build.sh
+          ./build.sh
+      
+      - name: Upload Lambda artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lambda-zips
+          path: |
+            lambda/read-api/dist/index.zip
+            lambda/admin-api/dist/index.zip
+          retention-days: 7
+
+  # Lint and test frontend
+  frontend-checks:
+    name: Frontend Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run linter
+        run: npm run lint
+      
+      - name: Type check
+        run: npx tsc --noEmit
+
+  # Terraform validation
+  terraform-validate:
+    name: Validate Terraform
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.6.0'
+      
+      - name: Terraform Format Check
+        run: |
+          cd terraform
+          terraform fmt -check
+      
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init -backend=false
+      
+      - name: Terraform Validate
+        run: |
+          cd terraform
+          terraform validate
+
+  # Deploy to AWS (only on main branch)
+  deploy:
+    name: Deploy to AWS
+    needs: [build-lambdas, frontend-checks, terraform-validate]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Download Lambda artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: lambda-zips
+          path: lambda
+      
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.6.0'
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init
+      
+      - name: Create terraform.tfvars
+        run: |
+          cd terraform
+          # Convert comma-separated origins to Terraform list format
+          ORIGINS="${{ secrets.ALLOWED_ORIGINS }}"
+          ORIGINS_LIST=$(echo "$ORIGINS" | awk -F',' '{for(i=1;i<=NF;i++) printf "\"%s\"%s", $i, (i<NF?",":"")}')
+          cat > terraform.tfvars <<EOF
+          admin_emails = ["${{ secrets.ADMIN_EMAIL }}"]
+          google_client_id = "${{ secrets.GOOGLE_CLIENT_ID }}"
+          google_client_secret = "${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          allowed_origins = [$ORIGINS_LIST]
+          EOF
+      
+      - name: Terraform Plan
+        run: |
+          cd terraform
+          terraform plan -out=tfplan
+      
+      - name: Terraform Apply
+        if: github.event_name == 'push'
+        run: |
+          cd terraform
+          terraform apply -auto-approve tfplan
+      
+      - name: Output API URL
+        run: |
+          cd terraform
+          terraform output -json | jq -r '.api_gateway_url.value // "Not available"'
+

@@ -1,0 +1,206 @@
+.admin-players {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.admin-header h2 {
+  margin: 0;
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.admin-add-button,
+.admin-edit-button {
+  padding: 0.5rem 1.5rem;
+  background: rgba(100, 150, 255, 0.3);
+  border: 1px solid rgba(100, 150, 255, 0.5);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-add-button:hover,
+.admin-edit-button:hover {
+  background: rgba(100, 150, 255, 0.4);
+  border-color: rgba(100, 150, 255, 0.7);
+}
+
+.admin-delete-button {
+  padding: 0.5rem 1.5rem;
+  background: rgba(255, 100, 100, 0.3);
+  border: 1px solid rgba(255, 100, 100, 0.5);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-delete-button:hover {
+  background: rgba(255, 100, 100, 0.4);
+  border-color: rgba(255, 100, 100, 0.7);
+}
+
+.admin-item-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-form {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.admin-form h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.admin-form-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-form-row label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.admin-form-row input[type="text"] {
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+}
+
+.admin-form-row input[type="text"]:focus {
+  outline: none;
+  border-color: rgba(100, 150, 255, 0.5);
+}
+
+.admin-form-row input[type="color"] {
+  width: 100%;
+  height: 40px;
+  padding: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.admin-form-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-form-actions button {
+  padding: 0.5rem 1.5rem;
+  background: rgba(100, 150, 255, 0.3);
+  border: 1px solid rgba(100, 150, 255, 0.5);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-form-actions button:hover {
+  background: rgba(100, 150, 255, 0.4);
+}
+
+.admin-form-actions button:last-child {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.admin-form-actions button:last-child:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-item-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.admin-item-color {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.admin-item-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.admin-loading,
+.admin-error {
+  text-align: center;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-loading p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+}
+
+.admin-error {
+  color: rgba(255, 100, 100, 0.9);
+}
+
+.admin-error button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}

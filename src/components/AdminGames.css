@@ -1,0 +1,290 @@
+.admin-games {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.admin-games h2 {
+  margin: 0 0 2rem 0;
+  font-size: 2rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.admin-games-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.admin-round {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+}
+
+.admin-round-title {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.5rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.admin-round-conferences {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.admin-conference {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-conference-title {
+  margin: 0;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  font-weight: 600;
+}
+
+.admin-conference-games,
+.admin-round-games {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.admin-game-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-game-card-editing {
+  background: rgba(100, 150, 255, 0.1);
+  border-color: rgba(100, 150, 255, 0.3);
+}
+
+.admin-game-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-game-team {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+}
+
+.admin-game-team img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.admin-game-team span:first-of-type {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.admin-game-score {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  min-width: 40px;
+  text-align: right;
+}
+
+.admin-game-divider {
+  text-align: center;
+  padding: 0.5rem 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.admin-game-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-game-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.admin-game-form-row label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.admin-game-form-row select,
+.admin-game-form-row input[type="number"] {
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+}
+
+.admin-game-form-row select:focus,
+.admin-game-form-row input[type="number"]:focus {
+  outline: none;
+  border-color: rgba(100, 150, 255, 0.5);
+}
+
+.admin-game-form-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.admin-form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.admin-form-actions button {
+  padding: 0.5rem 1.5rem;
+  background: rgba(100, 150, 255, 0.3);
+  border: 1px solid rgba(100, 150, 255, 0.5);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-form-actions button:hover {
+  background: rgba(100, 150, 255, 0.4);
+}
+
+.admin-form-actions button:last-child {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.admin-form-actions button:last-child:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.admin-game-picks-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-game-picks-section h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.admin-game-picks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-game-pick-row {
+  display: flex;
+  align-items: center;
+}
+
+.admin-game-pick-row label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.admin-player-name {
+  min-width: 120px;
+  font-weight: 500;
+}
+
+.admin-game-pick-row select {
+  flex: 1;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+}
+
+.admin-game-pick-row select:focus {
+  outline: none;
+  border-color: rgba(100, 150, 255, 0.5);
+}
+
+@media (max-width: 1024px) {
+  .admin-round-conferences {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-loading,
+.admin-error {
+  text-align: center;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-loading p {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.1rem;
+}
+
+.admin-error {
+  color: rgba(255, 100, 100, 0.9);
+}
+
+.admin-error button {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .admin-game-form-row {
+    grid-template-columns: 1fr;
+  }
+}
