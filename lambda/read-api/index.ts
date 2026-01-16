@@ -1,9 +1,9 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { getPlayers } from './handlers/players';
-import { getGames } from './handlers/games';
-import { getPicks } from './handlers/picks';
-import { getScoreboard } from './handlers/scoreboard';
-import { createResponse } from '../shared/utils';
+import { getPlayers } from './handlers/players.js';
+import { getGames } from './handlers/games.js';
+import { getPicks } from './handlers/picks.js';
+import { getScoreboard } from './handlers/scoreboard.js';
+import { createResponse } from '../shared/utils.js';
 
 export const handler = async (
   event: APIGatewayProxyEvent
@@ -23,13 +23,49 @@ export const handler = async (
     };
   }
 
-  // Normalize path (remove stage prefix if present)
-  const normalizedPath = path.replace(/^\/[^/]+/, '') || path;
+  // Normalize path (remove stage prefix if present, e.g., /prod/players -> /players)
+  let normalizedPath = path;
+  if (path.startsWith('/prod/')) {
+    normalizedPath = path.replace('/prod', '');
+  } else if (path.startsWith('/dev/')) {
+    normalizedPath = path.replace('/dev', '');
+  } else if (path.match(/^\/[^/]+\//)) {
+    // Remove any stage prefix
+    normalizedPath = path.replace(/^\/[^/]+/, '');
+  }
+  // Ensure it starts with /
+  if (!normalizedPath.startsWith('/')) {
+    normalizedPath = '/' + normalizedPath;
+  }
+
+  console.log('Request:', { httpMethod, path, normalizedPath, queryStringParameters });
+  console.log('Environment:', { 
+    PLAYERS_TABLE: process.env.PLAYERS_TABLE,
+    GAMES_TABLE: process.env.GAMES_TABLE,
+    PICKS_TABLE: process.env.PICKS_TABLE
+  });
 
   try {
+    // Health check endpoint
+    if (normalizedPath === '/health' && httpMethod === 'GET') {
+      return createResponse(200, { 
+        status: 'ok',
+        path: path,
+        normalizedPath: normalizedPath,
+        tables: {
+          players: process.env.PLAYERS_TABLE,
+          games: process.env.GAMES_TABLE,
+          picks: process.env.PICKS_TABLE,
+        }
+      });
+    }
+
     // Route requests
     if (normalizedPath === '/players' && httpMethod === 'GET') {
-      return await getPlayers();
+      console.log('Calling getPlayers...');
+      const result = await getPlayers();
+      console.log('getPlayers result:', JSON.stringify(result).substring(0, 100));
+      return result;
     }
 
     if (normalizedPath === '/games' && httpMethod === 'GET') {

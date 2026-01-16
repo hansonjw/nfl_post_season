@@ -1,6 +1,6 @@
 # IAM Role for Read API Lambda
 resource "aws_iam_role" "read_api_lambda" {
-  name = "${var.project_name}-read-api-lambda-role"
+  name = "${var.project_name}_read_api_lambda_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -16,7 +16,7 @@ resource "aws_iam_role" "read_api_lambda" {
 
 # IAM Policy for Read API Lambda (read-only DynamoDB access)
 resource "aws_iam_role_policy" "read_api_lambda" {
-  name = "${var.project_name}-read-api-lambda-policy"
+  name = "${var.project_name}_read_api_lambda_policy"
   role = aws_iam_role.read_api_lambda.id
 
   policy = jsonencode({
@@ -53,7 +53,7 @@ resource "aws_iam_role_policy" "read_api_lambda" {
 
 # IAM Role for Admin API Lambda
 resource "aws_iam_role" "admin_api_lambda" {
-  name = "${var.project_name}-admin-api-lambda-role"
+  name = "${var.project_name}_admin_api_lambda_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -69,7 +69,7 @@ resource "aws_iam_role" "admin_api_lambda" {
 
 # IAM Policy for Admin API Lambda (full DynamoDB access)
 resource "aws_iam_role_policy" "admin_api_lambda" {
-  name = "${var.project_name}-admin-api-lambda-policy"
+  name = "${var.project_name}_admin_api_lambda_policy"
   role = aws_iam_role.admin_api_lambda.id
 
   policy = jsonencode({

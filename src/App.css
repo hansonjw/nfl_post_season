@@ -26,7 +26,10 @@
   display: flex;
   gap: 1rem;
   justify-content: center;
+  align-items: center;
   margin-top: 1.5rem;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 .app-nav button {
@@ -39,6 +42,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  min-width: 140px;
+  flex-shrink: 0;
 }
 
 .app-nav button:hover {
@@ -52,6 +57,11 @@
   color: rgba(255, 255, 255, 1);
 }
 
+.app-nav .auth-login,
+.app-nav .auth-logout {
+  /* Inherits all styles from .app-nav button above */
+}
+
 .app-main {
   flex: 1;
   padding: 2rem;
@@ -60,3 +70,13 @@
   width: 100%;
 }
 
+.auth-login,
+.auth-logout {
+  /* Same styling as other nav buttons, but can be customized if needed */
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.7);
+}

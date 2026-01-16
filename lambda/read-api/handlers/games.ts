@@ -1,7 +1,7 @@
 import { ScanCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
-import { docClient, TABLES } from '../../shared/dynamodb';
-import type { Game } from '../../shared/types';
-import { createResponse } from '../../shared/utils';
+import { docClient, TABLES } from '../../shared/dynamodb.js';
+import type { Game } from '../../shared/types.js';
+import { createResponse } from '../../shared/utils.js';
 
 export async function getGames(gameId?: string): Promise<any> {
   try {

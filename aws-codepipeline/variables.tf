@@ -8,17 +8,20 @@ variable "github_repo" {
   type        = string
 }
 
+# Note: GitHub v2 uses CodeStar Connections, not tokens
+# The github_token variable is kept for reference but not used
 variable "github_token" {
-  description = "GitHub personal access token (for CodePipeline)"
+  description = "GitHub personal access token (deprecated - using CodeStar Connections v2 instead)"
   type        = string
   sensitive   = true
+  default     = ""  # Not used with v2
 }
 
 # Reuse variables from main terraform
 variable "project_name" {
   description = "Project name"
   type        = string
-  default     = "nfl-post-season"
+  default     = "nfl_post_season"
 }
 
 variable "admin_emails" {

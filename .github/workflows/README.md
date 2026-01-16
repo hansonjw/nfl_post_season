@@ -30,7 +30,10 @@ The pipeline runs on:
 - **Only runs on `main` branch pushes**
 - Downloads Lambda artifacts
 - Deploys infrastructure with Terraform
-- Outputs API Gateway URL
+- Builds frontend application
+- Deploys frontend to S3
+- Invalidates CloudFront cache
+- Outputs API Gateway URL and CloudFront URL
 
 ## Required GitHub Secrets
 
@@ -45,6 +48,7 @@ Configure these in your GitHub repository settings (Settings → Secrets and var
 - `GOOGLE_CLIENT_ID` - Google OAuth Client ID
 - `GOOGLE_CLIENT_SECRET` - Google OAuth Client Secret
 - `ALLOWED_ORIGINS` - Comma-separated list of allowed CORS origins (e.g., `https://yourdomain.com,http://localhost:5173`)
+- `VITE_API_URL` - (Optional) Frontend API URL. If not set, defaults to production API Gateway URL
 
 ## Setting Up Secrets
 
@@ -63,6 +67,8 @@ The AWS credentials need permissions for:
 - Cognito (create, update user pools)
 - IAM (create roles and policies)
 - CloudWatch Logs (create log groups)
+- S3 (put, delete objects in frontend bucket)
+- CloudFront (create invalidations)
 
 You can create a policy like:
 

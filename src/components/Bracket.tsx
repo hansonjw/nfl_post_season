@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { fetchGames, fetchPlayers, fetchPicks } from '../api/client';
-import type { Game, Player, Pick, TeamAbbreviation } from '../types';
+import type { Game, Player, Pick } from '../types';
 import { getTeamLogo, getTeamName, getNFLLogo } from '../utils/teams';
 import './Bracket.css';
 
 interface GameWithPicks extends Game {
   homePicks: number;
   awayPicks: number;
-  playerPicks: Array<{ playerId: string; playerName: string; pickedTeam: string }>;
+  playerPicks: Array<{ playerId: string; playerName: string; pickedTeam: string; playerColor?: string }>;
 }
 
 export function Bracket() {
@@ -55,6 +55,7 @@ export function Bracket() {
               playerId: pick.playerId,
               playerName: player?.name || 'Unknown',
               pickedTeam: pick.pickedTeam,
+              playerColor: player?.color,
             };
           });
 
@@ -113,9 +114,6 @@ export function Bracket() {
 
   return (
     <div className="bracket">
-      <h2>Playoff Bracket</h2>
-      <p className="bracket-subtitle">See who picked which teams</p>
-
       <div className="bracket-container">
         {/* Wild Card Round */}
         {gamesByRound['Wild Card'].length > 0 && (
@@ -215,7 +213,7 @@ interface BracketGameProps {
   players: Player[];
 }
 
-function BracketGame({ game, players }: BracketGameProps) {
+function BracketGame({ game }: BracketGameProps) {
   // Use NFL logo for games that haven't been established yet (TBD matchups)
   const nflLogo = getNFLLogo();
   
@@ -245,18 +243,23 @@ function BracketGame({ game, players }: BracketGameProps) {
               </span>
             )}
           </div>
-          {game.awayTeam && (
+          {game.awayTeam && awayPlayerPicks.length > 0 && (
             <div className="bracket-team-picks">
-              {game.awayPicks} {game.awayPicks === 1 ? 'pick' : 'picks'}
-              {awayPlayerPicks.length > 0 && (
-                <div className="bracket-team-pickers">
-                  {awayPlayerPicks.map(p => (
-                    <span key={p.playerId} className="bracket-picker">
-                      {p.playerName}
-                    </span>
-                  ))}
-                </div>
-              )}
+              <div className="bracket-team-pickers">
+                {awayPlayerPicks.map(p => (
+                  <span 
+                    key={p.playerId} 
+                    className="bracket-picker"
+                    style={{ 
+                      backgroundColor: '#666',
+                      color: 'white',
+                      border: `2px solid ${p.playerColor || '#FF5733'}`
+                    }}
+                  >
+                    {p.playerName}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -281,18 +284,23 @@ function BracketGame({ game, players }: BracketGameProps) {
               </span>
             )}
           </div>
-          {game.homeTeam && (
+          {game.homeTeam && homePlayerPicks.length > 0 && (
             <div className="bracket-team-picks">
-              {game.homePicks} {game.homePicks === 1 ? 'pick' : 'picks'}
-              {homePlayerPicks.length > 0 && (
-                <div className="bracket-team-pickers">
-                  {homePlayerPicks.map(p => (
-                    <span key={p.playerId} className="bracket-picker">
-                      {p.playerName}
-                    </span>
-                  ))}
-                </div>
-              )}
+              <div className="bracket-team-pickers">
+                {homePlayerPicks.map(p => (
+                  <span 
+                    key={p.playerId} 
+                    className="bracket-picker"
+                    style={{ 
+                      backgroundColor: '#666',
+                      color: 'white',
+                      border: `2px solid ${p.playerColor || '#FF5733'}`
+                    }}
+                  >
+                    {p.playerName}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
         </div>

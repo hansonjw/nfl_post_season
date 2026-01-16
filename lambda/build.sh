@@ -14,21 +14,15 @@ cd ..
 
 build_lambda() {
   local func_name=$1
+  local lambda_dir=$(pwd)
   echo "📦 Building $func_name..."
-  cd $func_name
+  cd "$lambda_dir/$func_name"
   rm -rf dist
   mkdir -p dist
   npm install
   
   # Compile TypeScript
   npx tsc
-  
-  # Copy shared code into dist (so imports from ../shared work)
-  # The compiled code has imports like: import { x } from '../shared/utils'
-  # So we need ../shared relative to dist/ to point to shared code
-  # We'll copy shared/dist to the parent of dist, as 'shared'
-  mkdir -p ../shared_compiled
-  cp -r ../shared/dist/* ../shared_compiled/
   
   # Install production dependencies in dist
   if [ -f "package.json" ]; then
@@ -38,19 +32,19 @@ build_lambda() {
     cd ..
   fi
   
-  # Create zip: include dist contents and the shared_compiled sibling
+  # Create zip: include dist contents and shared code at root
+  # The compiled code has imports like: import { x } from '../shared/utils'
+  # When Lambda runs read-api/index.js, ../shared resolves to shared/ at zip root
   cd dist
   zip -r index.zip . -q
-  cd ..
-  # Add shared code to zip
-  cd dist
-  zip -r index.zip ../../shared_compiled -q 2>/dev/null || true
-  cd ../..
+  # Add shared code at zip root (so ../shared from read-api/ resolves correctly)
+  if [ -d "$lambda_dir/shared/dist" ] && [ "$(ls -A $lambda_dir/shared/dist 2>/dev/null)" ]; then
+    cd "$lambda_dir/shared/dist"
+    zip -r "$lambda_dir/$func_name/dist/index.zip" . -q 2>/dev/null || true
+  fi
+  cd "$lambda_dir"
   
-  # Cleanup
-  rm -rf shared_compiled
-  
-  local zip_size=$(du -h $func_name/dist/index.zip 2>/dev/null | cut -f1 || echo "?")
+  local zip_size=$(du -h "$lambda_dir/$func_name/dist/index.zip" 2>/dev/null | cut -f1 || echo "?")
   echo "✓ $func_name built: $zip_size"
 }
 

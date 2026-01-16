@@ -1,7 +1,7 @@
 import { PutCommand, UpdateCommand, GetCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
-import { docClient, TABLES } from '../../shared/dynamodb';
-import type { Game, Pick } from '../../shared/types';
-import { createResponse, parseBody } from '../../shared/utils';
+import { docClient, TABLES } from '../../shared/dynamodb.js';
+import type { Game, Pick } from '../../shared/types.js';
+import { createResponse, parseBody } from '../../shared/utils.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function createGame(body: string): Promise<any> {
@@ -44,61 +44,73 @@ export async function updateGame(gameId: string, body: string): Promise<any> {
       return createResponse(400, { error: 'Invalid request body' });
     }
 
-    const updateExpression: string[] = [];
+    const setParts: string[] = [];
+    const removeParts: string[] = [];
     const expressionAttributeValues: Record<string, any> = {};
+    const expressionAttributeNames: Record<string, string> = {};
 
     if (data.round !== undefined) {
-      updateExpression.push('SET #round = :round');
+      setParts.push('#round = :round');
+      expressionAttributeNames['#round'] = 'round';
       expressionAttributeValues[':round'] = data.round;
     }
     if (data.week !== undefined) {
-      updateExpression.push('SET #week = :week');
+      setParts.push('#week = :week');
+      expressionAttributeNames['#week'] = 'week';
       expressionAttributeValues[':week'] = data.week;
     }
     if (data.conference !== undefined) {
-      updateExpression.push('SET conference = :conference');
+      setParts.push('conference = :conference');
       expressionAttributeValues[':conference'] = data.conference;
     } else if (data.round === 'Super Bowl') {
       // Remove conference for Super Bowl
-      updateExpression.push('REMOVE conference');
+      removeParts.push('conference');
     }
     if (data.homeTeam !== undefined) {
-      updateExpression.push('SET homeTeam = :homeTeam');
+      setParts.push('homeTeam = :homeTeam');
       expressionAttributeValues[':homeTeam'] = data.homeTeam;
     }
     if (data.awayTeam !== undefined) {
-      updateExpression.push('SET awayTeam = :awayTeam');
+      setParts.push('awayTeam = :awayTeam');
       expressionAttributeValues[':awayTeam'] = data.awayTeam;
     }
     if (data.homeScore !== undefined) {
-      updateExpression.push('SET homeScore = :homeScore');
+      setParts.push('homeScore = :homeScore');
       expressionAttributeValues[':homeScore'] = data.homeScore;
     }
     if (data.awayScore !== undefined) {
-      updateExpression.push('SET awayScore = :awayScore');
+      setParts.push('awayScore = :awayScore');
       expressionAttributeValues[':awayScore'] = data.awayScore;
     }
     if (data.winner !== undefined) {
-      updateExpression.push('SET #winner = :winner');
+      setParts.push('#winner = :winner');
+      expressionAttributeNames['#winner'] = 'winner';
       expressionAttributeValues[':winner'] = data.winner;
     }
     if (data.completed !== undefined) {
-      updateExpression.push('SET completed = :completed');
+      setParts.push('completed = :completed');
       expressionAttributeValues[':completed'] = data.completed;
     }
 
-    if (updateExpression.length === 0) {
+    if (setParts.length === 0 && removeParts.length === 0) {
       return createResponse(400, { error: 'No fields to update' });
+    }
+
+    // Build UpdateExpression: SET ... REMOVE ...
+    let updateExpression = '';
+    if (setParts.length > 0) {
+      updateExpression = `SET ${setParts.join(', ')}`;
+    }
+    if (removeParts.length > 0) {
+      if (updateExpression) updateExpression += ' ';
+      updateExpression += `REMOVE ${removeParts.join(', ')}`;
     }
 
     const command = new UpdateCommand({
       TableName: TABLES.GAMES,
       Key: { id: gameId },
-      UpdateExpression: updateExpression.join(', '),
-      ExpressionAttributeNames: {
-        '#round': 'round',
-        '#winner': 'winner',
-      },
+      UpdateExpression: updateExpression,
+      ...(Object.keys(expressionAttributeNames).length > 0 && { ExpressionAttributeNames: expressionAttributeNames }),
       ExpressionAttributeValues: expressionAttributeValues,
       ReturnValues: 'ALL_NEW',
     });

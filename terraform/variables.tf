@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "Project name for resource naming"
   type        = string
-  default     = "nfl-post-season"
+  default     = "nfl_post_season"
 }
 
 variable "admin_emails" {

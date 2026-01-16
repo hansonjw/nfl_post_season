@@ -8,12 +8,12 @@ terraform {
     }
   }
 
-  # Uncomment and configure if using remote state
-  # backend "s3" {
-  #   bucket = "your-terraform-state-bucket"
-  #   key    = "nfl-post-season/terraform.tfstate"
-  #   region = "us-east-1"
-  # }
+  backend "s3" {
+    bucket         = "nfl-post-season-terraform-state"
+    key            = "terraform/terraform.tfstate"
+    region         = "us-west-2"
+    dynamodb_table = "nfl_post_season_terraform_state_lock"
+  }
 }
 
 provider "aws" {

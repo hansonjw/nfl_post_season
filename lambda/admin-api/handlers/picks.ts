@@ -1,7 +1,7 @@
 import { PutCommand, UpdateCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
-import { docClient, TABLES } from '../../shared/dynamodb';
-import type { Pick, Game } from '../../shared/types';
-import { createResponse, parseBody } from '../../shared/utils';
+import { docClient, TABLES } from '../../shared/dynamodb.js';
+import type { Pick, Game } from '../../shared/types.js';
+import { createResponse, parseBody } from '../../shared/utils.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function createPick(body: string): Promise<any> {
@@ -119,34 +119,34 @@ export async function updatePick(pickId: string, body: string): Promise<any> {
       }
     }
 
-    const updateExpression: string[] = [];
+    const setParts: string[] = [];
     const expressionAttributeValues: Record<string, any> = {};
 
     if (data.playerId !== undefined) {
-      updateExpression.push('SET playerId = :playerId');
+      setParts.push('playerId = :playerId');
       expressionAttributeValues[':playerId'] = data.playerId;
     }
     if (data.gameId !== undefined) {
-      updateExpression.push('SET gameId = :gameId');
+      setParts.push('gameId = :gameId');
       expressionAttributeValues[':gameId'] = data.gameId;
     }
     if (data.pickedTeam !== undefined) {
-      updateExpression.push('SET pickedTeam = :pickedTeam');
+      setParts.push('pickedTeam = :pickedTeam');
       expressionAttributeValues[':pickedTeam'] = data.pickedTeam;
     }
     if (data.isCorrect !== undefined) {
-      updateExpression.push('SET isCorrect = :isCorrect');
+      setParts.push('isCorrect = :isCorrect');
       expressionAttributeValues[':isCorrect'] = data.isCorrect;
     }
 
-    if (updateExpression.length === 0) {
+    if (setParts.length === 0) {
       return createResponse(400, { error: 'No fields to update' });
     }
 
     const command = new UpdateCommand({
       TableName: TABLES.PICKS,
       Key: { id: pickId },
-      UpdateExpression: updateExpression.join(', '),
+      UpdateExpression: `SET ${setParts.join(', ')}`,
       ExpressionAttributeValues: expressionAttributeValues,
       ReturnValues: 'ALL_NEW',
     });

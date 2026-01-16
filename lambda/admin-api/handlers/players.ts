@@ -1,7 +1,7 @@
 import { PutCommand, UpdateCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
-import { docClient, TABLES } from '../../shared/dynamodb';
-import type { Player } from '../../shared/types';
-import { createResponse, parseBody } from '../../shared/utils';
+import { docClient, TABLES } from '../../shared/dynamodb.js';
+import type { Player } from '../../shared/types.js';
+import { createResponse, parseBody } from '../../shared/utils.js';
 import { v4 as uuidv4 } from 'uuid';
 
 export async function createPlayer(body: string): Promise<any> {
@@ -37,27 +37,27 @@ export async function updatePlayer(playerId: string, body: string): Promise<any>
       return createResponse(400, { error: 'Invalid request body' });
     }
 
-    const updateExpression: string[] = [];
+    const updateParts: string[] = [];
     const expressionAttributeValues: Record<string, any> = {};
 
     if (data.name !== undefined) {
-      updateExpression.push('SET #name = :name');
+      updateParts.push('#name = :name');
       expressionAttributeValues[':name'] = data.name;
     }
 
     if (data.color !== undefined) {
-      updateExpression.push('SET #color = :color');
+      updateParts.push('#color = :color');
       expressionAttributeValues[':color'] = data.color;
     }
 
-    if (updateExpression.length === 0) {
+    if (updateParts.length === 0) {
       return createResponse(400, { error: 'No fields to update' });
     }
 
     const command = new UpdateCommand({
       TableName: TABLES.PLAYERS,
       Key: { id: playerId },
-      UpdateExpression: updateExpression.join(', '),
+      UpdateExpression: `SET ${updateParts.join(', ')}`,
       ExpressionAttributeNames: {
         '#name': 'name',
         '#color': 'color',

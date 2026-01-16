@@ -1,6 +1,6 @@
 # CodePipeline for CI/CD
 resource "aws_codepipeline" "main" {
-  name     = "${var.project_name}-pipeline"
+  name     = "${var.project_name}_pipeline"
   role_arn = aws_iam_role.codepipeline.arn
 
   artifact_store {
@@ -14,16 +14,15 @@ resource "aws_codepipeline" "main" {
     action {
       name             = "Source"
       category         = "Source"
-      owner            = "ThirdParty"
-      provider         = "GitHub"
+      owner            = "AWS"
+      provider         = "CodeStarSourceConnection"
       version          = "1"
       output_artifacts = ["source_output"]
 
       configuration = {
-        Owner      = var.github_owner
-        Repo       = var.github_repo
-        Branch     = "main"
-        OAuthToken = var.github_token
+        ConnectionArn    = aws_codestarconnections_connection.github.arn
+        FullRepositoryId = "${var.github_owner}/${var.github_repo}"
+        BranchName       = "main"
       }
     }
   }
@@ -64,9 +63,15 @@ resource "aws_codepipeline" "main" {
   }
 }
 
+# CodeStar Connection for GitHub (v2)
+resource "aws_codestarconnections_connection" "github" {
+  name          = replace("${var.project_name}_github", "_", "-")
+  provider_type = "GitHub"
+}
+
 # S3 bucket for pipeline artifacts
 resource "aws_s3_bucket" "codepipeline_artifacts" {
-  bucket = "${var.project_name}-codepipeline-artifacts"
+  bucket = replace("${var.project_name}_codepipeline_artifacts", "_", "-")
 
   tags = {
     Project = var.project_name
@@ -82,7 +87,7 @@ resource "aws_s3_bucket_versioning" "codepipeline_artifacts" {
 
 # CodeBuild project for Lambda builds
 resource "aws_codebuild_project" "lambda_build" {
-  name          = "${var.project_name}-lambda-build"
+  name          = "${var.project_name}_lambda_build"
   description   = "Build Lambda functions"
   build_timeout = 20
   service_role  = aws_iam_role.codebuild.arn
@@ -112,7 +117,7 @@ resource "aws_codebuild_project" "lambda_build" {
 
 # CodeBuild project for Terraform deployment
 resource "aws_codebuild_project" "terraform_deploy" {
-  name          = "${var.project_name}-terraform-deploy"
+  name          = "${var.project_name}_terraform_deploy"
   description   = "Deploy infrastructure with Terraform"
   build_timeout = 60
   service_role  = aws_iam_role.codebuild.arn
@@ -158,7 +163,7 @@ resource "aws_codebuild_project" "terraform_deploy" {
 
 # IAM role for CodePipeline
 resource "aws_iam_role" "codepipeline" {
-  name = "${var.project_name}-codepipeline-role"
+  name = "${var.project_name}_codepipeline_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -173,7 +178,7 @@ resource "aws_iam_role" "codepipeline" {
 }
 
 resource "aws_iam_role_policy" "codepipeline" {
-  name = "${var.project_name}-codepipeline-policy"
+  name = "${var.project_name}_codepipeline_policy"
   role = aws_iam_role.codepipeline.id
 
   policy = jsonencode({
@@ -198,6 +203,13 @@ resource "aws_iam_role_policy" "codepipeline" {
           aws_codebuild_project.lambda_build.arn,
           aws_codebuild_project.terraform_deploy.arn
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "codestar-connections:UseConnection"
+        ]
+        Resource = aws_codestarconnections_connection.github.arn
       }
     ]
   })
@@ -205,7 +217,7 @@ resource "aws_iam_role_policy" "codepipeline" {
 
 # IAM role for CodeBuild
 resource "aws_iam_role" "codebuild" {
-  name = "${var.project_name}-codebuild-role"
+  name = "${var.project_name}_codebuild_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -220,7 +232,7 @@ resource "aws_iam_role" "codebuild" {
 }
 
 resource "aws_iam_role_policy" "codebuild" {
-  name = "${var.project_name}-codebuild-policy"
+  name = "${var.project_name}_codebuild_policy"
   role = aws_iam_role.codebuild.id
 
   policy = jsonencode({

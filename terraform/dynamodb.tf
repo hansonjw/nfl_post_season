@@ -1,6 +1,6 @@
 # Players table
 resource "aws_dynamodb_table" "players" {
-  name           = "${var.project_name}-players"
+  name           = "${var.project_name}_players"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "id"
 
@@ -16,7 +16,7 @@ resource "aws_dynamodb_table" "players" {
 
 # Games table
 resource "aws_dynamodb_table" "games" {
-  name           = "${var.project_name}-games"
+  name           = "${var.project_name}_games"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "id"
 
@@ -40,6 +40,7 @@ resource "aws_dynamodb_table" "games" {
     name     = "round-week-index"
     hash_key = "round"
     range_key = "week"
+    projection_type = "ALL"
   }
 
   tags = {
@@ -49,7 +50,7 @@ resource "aws_dynamodb_table" "games" {
 
 # Picks table
 resource "aws_dynamodb_table" "picks" {
-  name           = "${var.project_name}-picks"
+  name           = "${var.project_name}_picks"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "id"
 
@@ -72,12 +73,14 @@ resource "aws_dynamodb_table" "picks" {
   global_secondary_index {
     name     = "player-index"
     hash_key = "playerId"
+    projection_type = "ALL"
   }
 
   # Global Secondary Index for querying picks by game
   global_secondary_index {
     name     = "game-index"
     hash_key = "gameId"
+    projection_type = "ALL"
   }
 
   tags = {

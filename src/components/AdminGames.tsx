@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchGames, updateGame, fetchPlayers, fetchPicks, createPick } from '../api/client';
+import { fetchGames, createGame, updateGame, fetchPlayers, fetchPicks, createPick } from '../api/client';
 import type { Game, TeamAbbreviation, PlayoffRound, Conference, Player, Pick } from '../types';
 import { TEAM_NAMES, getTeamName, getTeamLogo, getNFLLogo } from '../utils/teams';
 import './AdminGames.css';
@@ -22,6 +22,7 @@ export function AdminGames() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [creatingNew, setCreatingNew] = useState(false);
   const [formData, setFormData] = useState<EditingGame | null>(null);
   const [playerPicks, setPlayerPicks] = useState<Record<string, TeamAbbreviation | ''>>({});
 
@@ -74,47 +75,107 @@ export function AdminGames() {
     setPlayerPicks(picksMap);
   }
 
+  function handleCreateNew() {
+    setCreatingNew(true);
+    setEditingId('new');
+    setFormData({
+      id: 'new',
+      round: 'Wild Card',
+      conference: 'AFC',
+      week: 1,
+      completed: false,
+    });
+    setPlayerPicks({});
+  }
+
   async function handleSave() {
-    if (!formData || !editingId) return;
+    if (!formData) return;
 
     try {
-      const updates: any = {
-        round: formData.round,
-        week: formData.week,
-        completed: formData.completed,
-      };
-
-      if (formData.round !== 'Super Bowl') {
-        updates.conference = formData.conference;
-      } else {
-        updates.conference = undefined;
-      }
-
-      if (formData.homeTeam) updates.homeTeam = formData.homeTeam;
-      if (formData.awayTeam) updates.awayTeam = formData.awayTeam;
-      if (formData.homeScore !== undefined) updates.homeScore = formData.homeScore;
-      if (formData.awayScore !== undefined) updates.awayScore = formData.awayScore;
-      if (formData.winner) updates.winner = formData.winner;
-
-      await updateGame(editingId, updates);
-      
-      // Save picks for each player
-      if (formData.homeTeam && formData.awayTeam) {
-        const pickPromises = players.map(async (player) => {
-          const pickedTeam = playerPicks[player.id];
-          if (pickedTeam && (pickedTeam === formData.homeTeam || pickedTeam === formData.awayTeam)) {
-            await createPick({
-              playerId: player.id,
-              gameId: editingId,
-              pickedTeam: pickedTeam,
-            });
-          }
+      if (creatingNew) {
+        // Create new game
+        const newGame = await createGame({
+          round: formData.round,
+          week: formData.week,
+          homeTeam: formData.homeTeam,
+          awayTeam: formData.awayTeam,
+          conference: formData.conference,
         });
-        await Promise.all(pickPromises);
+        
+        const gameId = newGame.id;
+        
+        // Update the game with additional fields
+        const updates: any = {
+          completed: formData.completed,
+        };
+        
+        if (formData.round !== 'Super Bowl') {
+          updates.conference = formData.conference;
+        }
+        
+        if (formData.homeScore !== undefined) updates.homeScore = formData.homeScore;
+        if (formData.awayScore !== undefined) updates.awayScore = formData.awayScore;
+        if (formData.winner) updates.winner = formData.winner;
+        
+        if (Object.keys(updates).length > 0) {
+          await updateGame(gameId, updates);
+        }
+        
+        // Save picks for each player
+        if (formData.homeTeam && formData.awayTeam) {
+          const pickPromises = players.map(async (player) => {
+            const pickedTeam = playerPicks[player.id];
+            if (pickedTeam && (pickedTeam === formData.homeTeam || pickedTeam === formData.awayTeam)) {
+              await createPick({
+                playerId: player.id,
+                gameId: gameId,
+                pickedTeam: pickedTeam,
+              });
+            }
+          });
+          await Promise.all(pickPromises);
+        }
+      } else if (editingId) {
+        // Update existing game
+        const updates: any = {
+          round: formData.round,
+          week: formData.week,
+          completed: formData.completed,
+        };
+
+        if (formData.round !== 'Super Bowl') {
+          updates.conference = formData.conference;
+        } else {
+          updates.conference = undefined;
+        }
+
+        if (formData.homeTeam) updates.homeTeam = formData.homeTeam;
+        if (formData.awayTeam) updates.awayTeam = formData.awayTeam;
+        if (formData.homeScore !== undefined) updates.homeScore = formData.homeScore;
+        if (formData.awayScore !== undefined) updates.awayScore = formData.awayScore;
+        if (formData.winner) updates.winner = formData.winner;
+
+        await updateGame(editingId, updates);
+        
+        // Save picks for each player
+        if (formData.homeTeam && formData.awayTeam) {
+          const pickPromises = players.map(async (player) => {
+            const pickedTeam = playerPicks[player.id];
+            if (pickedTeam && (pickedTeam === formData.homeTeam || pickedTeam === formData.awayTeam)) {
+              await createPick({
+                playerId: player.id,
+                gameId: editingId,
+                pickedTeam: pickedTeam,
+              });
+            }
+          });
+          await Promise.all(pickPromises);
+        }
       }
       
       await loadData();
       setEditingId(null);
+      setCreatingNew(false);
       setFormData(null);
       setPlayerPicks({});
     } catch (err) {
@@ -125,6 +186,7 @@ export function AdminGames() {
 
   function handleCancel() {
     setEditingId(null);
+    setCreatingNew(false);
     setFormData(null);
     setPlayerPicks({});
   }
@@ -156,12 +218,54 @@ export function AdminGames() {
 
   return (
     <div className="admin-games">
-      <h2>Manage Games</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h2>Manage Games</h2>
+        {!creatingNew && (
+          <button 
+            onClick={handleCreateNew}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#4CAF50',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '16px'
+            }}
+          >
+            + Add Game
+          </button>
+        )}
+      </div>
+
+      {creatingNew && formData && (
+        <div style={{ marginBottom: '20px', padding: '20px', backgroundColor: '#2a2a2a', borderRadius: '8px' }}>
+          <AdminGameCard
+            game={{
+              id: 'new',
+              round: formData.round,
+              conference: formData.conference,
+              week: formData.week,
+              completed: false,
+            } as Game}
+            players={players}
+            playerPicks={playerPicks}
+            onPlayerPickChange={setPlayerPicks}
+            isEditing={true}
+            formData={formData}
+            onEdit={() => {}}
+            onSave={handleSave}
+            onCancel={handleCancel}
+            onFormDataChange={setFormData}
+          />
+        </div>
+      )}
 
       <div className="admin-games-container">
         {ROUNDS.map(round => {
           const roundGames = gamesByRound[round];
-          if (roundGames.length === 0) return null;
+          // Show round even if empty, or if we're creating a game in this round
+          if (roundGames.length === 0 && (!creatingNew || formData?.round !== round)) return null;
 
           const afcGames = roundGames.filter(g => g.conference === 'AFC');
           const nfcGames = roundGames.filter(g => g.conference === 'NFC');
@@ -174,7 +278,7 @@ export function AdminGames() {
               
               {isSuperBowl ? (
                 <div className="admin-round-games">
-                  {superBowl.map(game => (
+                  {superBowl.filter(g => g.id !== 'new').map(game => (
                     <AdminGameCard
                       key={game.id}
                       game={game}
@@ -196,7 +300,7 @@ export function AdminGames() {
                     <div className="admin-conference">
                       <h4 className="admin-conference-title">AFC</h4>
                       <div className="admin-conference-games">
-                        {afcGames.map(game => (
+                        {afcGames.filter(g => g.id !== 'new').map(game => (
                           <AdminGameCard
                             key={game.id}
                             game={game}
@@ -219,7 +323,7 @@ export function AdminGames() {
                     <div className="admin-conference">
                       <h4 className="admin-conference-title">NFC</h4>
                       <div className="admin-conference-games">
-                        {nfcGames.map(game => (
+                        {nfcGames.filter(g => g.id !== 'new').map(game => (
                           <AdminGameCard
                             key={game.id}
                             game={game}
@@ -306,6 +410,52 @@ function AdminGameCard({
   return (
     <div className="admin-game-card admin-game-card-editing">
       <div className="admin-game-form">
+        <div className="admin-game-form-row">
+          <label>
+            Round:
+            <select
+              value={formData.round}
+              onChange={(e) => onFormDataChange({ 
+                ...formData, 
+                round: e.target.value as PlayoffRound,
+                conference: e.target.value === 'Super Bowl' ? undefined : formData.conference
+              })}
+            >
+              {ROUNDS.map(round => (
+                <option key={round} value={round}>{round}</option>
+              ))}
+            </select>
+          </label>
+          {formData.round !== 'Super Bowl' && (
+            <label>
+              Conference:
+              <select
+                value={formData.conference || ''}
+                onChange={(e) => onFormDataChange({ 
+                  ...formData, 
+                  conference: e.target.value as Conference
+                })}
+              >
+                {CONFERENCES.map(conf => (
+                  <option key={conf} value={conf}>{conf}</option>
+                ))}
+              </select>
+            </label>
+          )}
+          <label>
+            Week:
+            <input
+              type="number"
+              value={formData.week}
+              onChange={(e) => onFormDataChange({ 
+                ...formData, 
+                week: parseInt(e.target.value) || 1
+              })}
+              min="1"
+            />
+          </label>
+        </div>
+        
         <div className="admin-game-form-row">
           <label>
             Away Team:
@@ -404,7 +554,11 @@ function AdminGameCard({
                   <label>
                     <span 
                       className="admin-player-name"
-                      style={{ color: player.color || '#FF5733' }}
+                      style={{ 
+                        backgroundColor: '#666',
+                        color: 'white',
+                        border: `2px solid ${player.color || '#FF5733'}`
+                      }}
                     >
                       {player.name}:
                     </span>

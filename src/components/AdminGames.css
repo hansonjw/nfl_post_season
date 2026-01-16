@@ -230,8 +230,14 @@
 }
 
 .admin-player-name {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #666;
+  color: white;
+  border-radius: 4px;
   min-width: 120px;
   font-weight: 500;
+  /* Border color is applied via inline style from player.color */
 }
 
 .admin-game-pick-row select {

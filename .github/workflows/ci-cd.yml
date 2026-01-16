@@ -8,7 +8,7 @@ on:
   workflow_dispatch: # Allow manual triggers
 
 env:
-  AWS_REGION: us-east-1
+  AWS_REGION: us-west-2
   NODE_VERSION: '20'
 
 jobs:
@@ -164,4 +164,47 @@ jobs:
         run: |
           cd terraform
           terraform output -json | jq -r '.api_gateway_url.value // "Not available"'
+      
+      - name: Setup Node.js for Frontend
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install Frontend Dependencies
+        run: npm ci
+      
+      - name: Build Frontend
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://7fafxcafc1.execute-api.us-west-2.amazonaws.com/prod' }}
+      
+      - name: Get S3 Bucket Name
+        id: get-bucket
+        run: |
+          cd terraform
+          BUCKET=$(terraform output -raw frontend_bucket_name)
+          echo "bucket=$BUCKET" >> $GITHUB_OUTPUT
+      
+      - name: Deploy Frontend to S3
+        run: |
+          aws s3 sync dist/ s3://${{ steps.get-bucket.outputs.bucket }} --delete
+      
+      - name: Get CloudFront Distribution ID
+        id: get-distribution
+        run: |
+          cd terraform
+          DIST_ID=$(terraform output -raw cloudfront_distribution_id)
+          echo "distribution_id=$DIST_ID" >> $GITHUB_OUTPUT
+      
+      - name: Invalidate CloudFront Cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ steps.get-distribution.outputs.distribution_id }} \
+            --paths "/*"
+      
+      - name: Output Frontend URL
+        run: |
+          cd terraform
+          terraform output -json | jq -r '.cloudfront_url.value // "Not available"'
 

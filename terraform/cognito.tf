@@ -1,18 +1,8 @@
 # Cognito User Pool
 resource "aws_cognito_user_pool" "main" {
-  name = "${var.project_name}-user-pool"
+  name = "${var.project_name}_user_pool"
 
   username_attributes = ["email"]
-
-  # Google OAuth Identity Provider
-  identity_provider {
-    provider_name = "Google"
-    provider_type = "Google"
-  }
-
-  # OAuth settings
-  callback_urls = var.allowed_origins
-  logout_urls   = var.allowed_origins
 
   schema {
     name                = "email"
@@ -20,46 +10,33 @@ resource "aws_cognito_user_pool" "main" {
     required            = true
     mutable             = true
   }
+
+  password_policy {
+    minimum_length    = 8
+    require_lowercase = true
+    require_uppercase = true
+    require_numbers   = true
+    require_symbols   = false
+  }
+
+  auto_verified_attributes = ["email"]
 }
 
 # Cognito User Pool Client
 resource "aws_cognito_user_pool_client" "main" {
-  name         = "${var.project_name}-client"
+  name         = "${var.project_name}_client"
   user_pool_id = aws_cognito_user_pool.main.id
 
   generate_secret = false
 
-  supported_identity_providers = ["Google"]
+  # Use Cognito's built-in authentication (username/password)
+  explicit_auth_flows = [
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
 
-  callback_urls = var.allowed_origins
-  logout_urls   = var.allowed_origins
-
-  allowed_oauth_flows                  = ["code"]
-  allowed_oauth_scopes                 = ["email", "openid", "profile"]
-  allowed_oauth_flows_user_pool_client = true
-}
-
-# Cognito Identity Provider (Google)
-resource "aws_cognito_identity_provider" "google" {
-  user_pool_id  = aws_cognito_user_pool.main.id
-  provider_name = "Google"
-  provider_type = "Google"
-
-  provider_details = {
-    client_id        = var.google_client_id
-    client_secret    = var.google_client_secret
-    authorize_scopes = "email openid profile"
-  }
-
-  attribute_mapping = {
-    email    = "email"
-    username = "email"
-  }
-}
-
-# Cognito User Pool Domain (for OAuth redirects)
-resource "aws_cognito_user_pool_domain" "main" {
-  domain       = "${var.project_name}-auth"
-  user_pool_id = aws_cognito_user_pool.main.id
+  # Explicitly remove any identity providers (use Cognito's built-in auth only)
+  supported_identity_providers = []
 }
 

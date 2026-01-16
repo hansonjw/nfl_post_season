@@ -1,0 +1,37 @@
+[
+  {
+    "id": "d94c02a5-0d31-4284-ab68-f40fd0b79a4f",
+    "name": "Charlie Brown",
+    "color": "#F5FF33"
+  },
+  {
+    "id": "cff2bda0-9d8d-4c36-90d8-bd3fd66f2536",
+    "name": "Bob Wilson",
+    "color": "#3357FF"
+  },
+  {
+    "id": "ac8b6788-27df-437c-843a-5f0cfc338bc5",
+    "name": "Diana Prince",
+    "color": "#33FFF5"
+  },
+  {
+    "id": "6d043166-3aaa-446a-94de-c72daf6a98fb",
+    "name": "Alice Johnson",
+    "color": "#FF33F5"
+  },
+  {
+    "id": "a1c7de1e-d1a4-43e7-bcde-dc5ac056ba9a",
+    "name": "Jane Smith",
+    "color": "#33FF57"
+  },
+  {
+    "id": "86e4df4d-b999-4b16-bca0-b8b0db52924c",
+    "name": "Eve Adams",
+    "color": "#FF8C33"
+  },
+  {
+    "id": "701902b0-ba80-4546-99d2-6ebc499c91bf",
+    "name": "John Doe",
+    "color": "#FF5733"
+  }
+]

@@ -28,6 +28,15 @@ terraform/*.tfvars
 terraform/tfplan
 terraform/.terraform.tfstate.lock.info
 
+# Terraform Bootstrap (uses local state)
+terraform-bootstrap/.terraform/
+terraform-bootstrap/.terraform.lock.hcl
+terraform-bootstrap/*.tfstate
+terraform-bootstrap/*.tfstate.*
+terraform-bootstrap/*.tfvars
+!terraform-bootstrap/*.tfvars.example
+terraform-bootstrap/.terraform.tfstate.lock.info
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

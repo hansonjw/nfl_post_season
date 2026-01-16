@@ -61,14 +61,6 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
-.scoreboard-table tbody tr.winner {
-  background: rgba(255, 215, 0, 0.15);
-  border-bottom: 2px solid rgba(255, 215, 0, 0.3);
-}
-
-.scoreboard-table tbody tr.winner:hover {
-  background: rgba(255, 215, 0, 0.2);
-}
 
 .scoreboard-table td {
   padding: 1rem;
@@ -89,9 +81,10 @@
 .player-name {
   display: inline-block;
   padding: 0.25rem 0.75rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: #666;
+  color: white;
   border-radius: 4px;
-  color: rgba(255, 255, 255, 0.9);
+  /* Border color is applied via inline style from player.color */
 }
 
 .scoreboard-table td.correct-col,
@@ -109,10 +102,6 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-.scoreboard-table tbody tr.winner .percentage-value {
-  background: rgba(255, 215, 0, 0.3);
-  color: rgba(255, 255, 255, 1);
-}
 
 .scoreboard-footer {
   margin-top: 1rem;

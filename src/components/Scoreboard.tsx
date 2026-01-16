@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { fetchScoreboard } from '../api/client';
-import type { PlayerScore } from '../types';
+import { fetchScoreboard, fetchPlayers } from '../api/client';
+import type { PlayerScore, Player } from '../types';
 import './Scoreboard.css';
 
 export function Scoreboard() {
   const [scores, setScores] = useState<PlayerScore[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,8 +14,12 @@ export function Scoreboard() {
       try {
         setLoading(true);
         setError(null);
-        const data = await fetchScoreboard();
-        setScores(data);
+        const [scoresData, playersData] = await Promise.all([
+          fetchScoreboard(),
+          fetchPlayers(),
+        ]);
+        setScores(scoresData);
+        setPlayers(playersData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load scoreboard');
         console.error('Error loading scoreboard:', err);
@@ -57,15 +62,14 @@ export function Scoreboard() {
 
   return (
     <div className="scoreboard">
-      <h2>Standings</h2>
       <div className="scoreboard-table-container">
         <table className="scoreboard-table">
           <thead>
             <tr>
               <th className="rank-col">Rank</th>
               <th className="player-col">Player</th>
-              <th className="correct-col">Correct</th>
-              <th className="total-col">Total</th>
+              <th className="correct-col">Wins</th>
+              <th className="total-col">Games</th>
               <th className="percentage-col">Win %</th>
             </tr>
           </thead>
@@ -74,12 +78,23 @@ export function Scoreboard() {
               const isTied = index > 0 && scores[index - 1].percentage === score.percentage && 
                             scores[index - 1].totalCorrect === score.totalCorrect;
               const rank = isTied ? '' : index + 1;
+              const player = players.find(p => p.id === score.playerId);
+              const playerColor = player?.color || 'rgba(255, 255, 255, 0.9)';
               
               return (
-                <tr key={score.playerId} className={index === 0 ? 'winner' : ''}>
+                <tr key={score.playerId}>
                   <td className="rank-col">{rank}</td>
                   <td className="player-col">
-                    <span className="player-name">{score.playerName}</span>
+                    <span 
+                      className="player-name"
+                      style={{ 
+                        backgroundColor: '#666',
+                        color: 'white',
+                        border: `2px solid ${playerColor}`
+                      }}
+                    >
+                      {score.playerName}
+                    </span>
                   </td>
                   <td className="correct-col">{score.totalCorrect}</td>
                   <td className="total-col">{score.totalPicks}</td>
