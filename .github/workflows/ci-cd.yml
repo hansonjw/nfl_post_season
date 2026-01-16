@@ -25,11 +25,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: |
-            lambda/shared/package-lock.json
-            lambda/read-api/package-lock.json
-            lambda/admin-api/package-lock.json
+          # Cache disabled for Lambda builds - they're fast and cache paths are complex
       
       - name: Install zip
         run: sudo apt-get update && sudo apt-get install -y zip
@@ -63,6 +59,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       
       - name: Install dependencies
         run: npm ci
@@ -170,6 +167,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: package-lock.json
       
       - name: Install Frontend Dependencies
         run: npm ci
