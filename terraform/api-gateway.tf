@@ -118,10 +118,10 @@ resource "aws_api_gateway_integration" "players_get" {
 
 # Players POST (admin-api, conditionally enabled via enable_write_endpoints variable)
 resource "aws_api_gateway_method" "players_post" {
-  count       = var.enable_write_endpoints ? 1 : 0
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  resource_id = aws_api_gateway_resource.players.id
-  http_method = "POST"
+  count         = var.enable_write_endpoints ? 1 : 0
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.players.id
+  http_method   = "POST"
   authorization = "NONE"
 }
 
@@ -138,10 +138,10 @@ resource "aws_api_gateway_integration" "players_post" {
 
 # Players PUT (admin-api, conditionally enabled) - on {id} resource
 resource "aws_api_gateway_method" "players_put" {
-  count       = var.enable_write_endpoints ? 1 : 0
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  resource_id = aws_api_gateway_resource.players_id.id
-  http_method = "PUT"
+  count         = var.enable_write_endpoints ? 1 : 0
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.players_id.id
+  http_method   = "PUT"
   authorization = "NONE"
 }
 
@@ -158,10 +158,10 @@ resource "aws_api_gateway_integration" "players_put" {
 
 # Players DELETE (admin-api, conditionally enabled) - on {id} resource
 resource "aws_api_gateway_method" "players_delete" {
-  count       = var.enable_write_endpoints ? 1 : 0
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  resource_id = aws_api_gateway_resource.players_id.id
-  http_method = "DELETE"
+  count         = var.enable_write_endpoints ? 1 : 0
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.players_id.id
+  http_method   = "DELETE"
   authorization = "NONE"
 }
 
@@ -196,10 +196,10 @@ resource "aws_api_gateway_integration" "games_get" {
 
 # Games POST (admin-api, conditionally enabled)
 resource "aws_api_gateway_method" "games_post" {
-  count       = var.enable_write_endpoints ? 1 : 0
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  resource_id = aws_api_gateway_resource.games.id
-  http_method = "POST"
+  count         = var.enable_write_endpoints ? 1 : 0
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.games.id
+  http_method   = "POST"
   authorization = "NONE"
 }
 
@@ -216,10 +216,10 @@ resource "aws_api_gateway_integration" "games_post" {
 
 # Games PUT (admin-api, conditionally enabled) - on {id} resource
 resource "aws_api_gateway_method" "games_put" {
-  count       = var.enable_write_endpoints ? 1 : 0
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  resource_id = aws_api_gateway_resource.games_id.id
-  http_method = "PUT"
+  count         = var.enable_write_endpoints ? 1 : 0
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.games_id.id
+  http_method   = "PUT"
   authorization = "NONE"
 }
 
@@ -254,10 +254,10 @@ resource "aws_api_gateway_integration" "picks_get" {
 
 # Picks POST (admin-api, conditionally enabled)
 resource "aws_api_gateway_method" "picks_post" {
-  count       = var.enable_write_endpoints ? 1 : 0
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  resource_id = aws_api_gateway_resource.picks.id
-  http_method = "POST"
+  count         = var.enable_write_endpoints ? 1 : 0
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.picks.id
+  http_method   = "POST"
   authorization = "NONE"
 }
 
@@ -274,10 +274,10 @@ resource "aws_api_gateway_integration" "picks_post" {
 
 # Picks PUT (admin-api, conditionally enabled) - on {id} resource
 resource "aws_api_gateway_method" "picks_put" {
-  count       = var.enable_write_endpoints ? 1 : 0
-  rest_api_id = aws_api_gateway_rest_api.main.id
-  resource_id = aws_api_gateway_resource.picks_id.id
-  http_method = "PUT"
+  count         = var.enable_write_endpoints ? 1 : 0
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  resource_id   = aws_api_gateway_resource.picks_id.id
+  http_method   = "PUT"
   authorization = "NONE"
 }
 
@@ -712,7 +712,7 @@ resource "aws_api_gateway_deployment" "main" {
       var.enable_write_endpoints ? try(aws_api_gateway_integration.picks_put[0].id, null) : null,
       aws_api_gateway_authorizer.cognito.id,
       timestamp(),
-      "force-deploy-v2",  # Force new deployment
+      "force-deploy-v2", # Force new deployment
     ])))
   }
 
