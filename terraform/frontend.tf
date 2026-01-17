@@ -4,7 +4,7 @@ resource "aws_s3_bucket" "frontend" {
 
   tags = {
     Name        = "${var.project_name} Frontend"
-    Environment  = "production"
+    Environment = "production"
   }
 }
 
@@ -144,9 +144,9 @@ resource "aws_cloudfront_distribution" "frontend" {
   # Custom error responses for SPA routing
   custom_error_response {
     error_caching_min_ttl = 300
-    error_code              = 404
-    response_code           = 200
-    response_page_path     = "/index.html"
+    error_code            = 404
+    response_code         = 200
+    response_page_path    = "/index.html"
   }
 
   custom_error_response {

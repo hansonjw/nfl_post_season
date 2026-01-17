@@ -11,10 +11,10 @@ resource "aws_api_gateway_rest_api" "main" {
 # API Gateway Authorizer (Cognito)
 # Using a new name to create a fresh authorizer without identity_source
 resource "aws_api_gateway_authorizer" "cognito" {
-  name                   = "${var.project_name}_cognito_authorizer_v2"
-  rest_api_id            = aws_api_gateway_rest_api.main.id
-  type                   = "COGNITO_USER_POOLS"
-  provider_arns          = [aws_cognito_user_pool.main.arn]
+  name          = "${var.project_name}_cognito_authorizer_v2"
+  rest_api_id   = aws_api_gateway_rest_api.main.id
+  type          = "COGNITO_USER_POOLS"
+  provider_arns = [aws_cognito_user_pool.main.arn]
   # For COGNITO_USER_POOLS, identity_source must NOT be set
   # API Gateway automatically extracts the token from Authorization header
   # Setting identity_source causes it to parse as AWS Signature V4 instead of JWT
@@ -297,7 +297,7 @@ resource "aws_api_gateway_integration" "players_options" {
 
   type                    = "MOCK"
   integration_http_method = "POST"
-  
+
   request_templates = {
     "application/json" = "{\"statusCode\":200}"
   }
@@ -349,7 +349,7 @@ resource "aws_api_gateway_integration" "games_options" {
 
   type                    = "MOCK"
   integration_http_method = "POST"
-  
+
   request_templates = {
     "application/json" = "{\"statusCode\":200}"
   }
@@ -401,7 +401,7 @@ resource "aws_api_gateway_integration" "picks_options" {
 
   type                    = "MOCK"
   integration_http_method = "POST"
-  
+
   request_templates = {
     "application/json" = "{\"statusCode\":200}"
   }
@@ -453,7 +453,7 @@ resource "aws_api_gateway_integration" "scoreboard_options" {
 
   type                    = "MOCK"
   integration_http_method = "POST"
-  
+
   request_templates = {
     "application/json" = "{\"statusCode\":200}"
   }
@@ -507,7 +507,7 @@ resource "aws_api_gateway_integration" "players_id_options" {
 
   type                    = "MOCK"
   integration_http_method = "POST"
-  
+
   request_templates = {
     "application/json" = "{\"statusCode\":200}"
   }
@@ -560,7 +560,7 @@ resource "aws_api_gateway_integration" "games_id_options" {
 
   type                    = "MOCK"
   integration_http_method = "POST"
-  
+
   request_templates = {
     "application/json" = "{\"statusCode\":200}"
   }
@@ -613,7 +613,7 @@ resource "aws_api_gateway_integration" "picks_id_options" {
 
   type                    = "MOCK"
   integration_http_method = "POST"
-  
+
   request_templates = {
     "application/json" = "{\"statusCode\":200}"
   }

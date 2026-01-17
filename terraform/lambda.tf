@@ -2,10 +2,10 @@
 resource "aws_lambda_function" "read_api" {
   filename         = "${path.module}/../lambda/read-api/dist/index.zip"
   function_name    = "${var.project_name}_read_api"
-  role            = aws_iam_role.read_api_lambda.arn
-  handler         = "read-api/index.handler"
-  runtime         = "nodejs20.x"
-  timeout         = 30
+  role             = aws_iam_role.read_api_lambda.arn
+  handler          = "read-api/index.handler"
+  runtime          = "nodejs20.x"
+  timeout          = 30
   source_code_hash = filebase64sha256("${path.module}/../lambda/read-api/dist/index.zip")
 
   environment {
@@ -25,10 +25,10 @@ resource "aws_lambda_function" "read_api" {
 resource "aws_lambda_function" "admin_api" {
   filename         = "${path.module}/../lambda/admin-api/dist/index.zip"
   function_name    = "${var.project_name}_admin_api"
-  role            = aws_iam_role.admin_api_lambda.arn
-  handler         = "admin-api/index.handler"
-  runtime         = "nodejs20.x"
-  timeout         = 30
+  role             = aws_iam_role.admin_api_lambda.arn
+  handler          = "admin-api/index.handler"
+  runtime          = "nodejs20.x"
+  timeout          = 30
   source_code_hash = filebase64sha256("${path.module}/../lambda/admin-api/dist/index.zip")
 
   environment {
