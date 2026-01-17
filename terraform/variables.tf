@@ -17,15 +17,17 @@ variable "admin_emails" {
 }
 
 variable "google_client_id" {
-  description = "Google OAuth Client ID"
+  description = "Google OAuth Client ID (deprecated - not used, kept for backward compatibility)"
   type        = string
   sensitive   = true
+  default     = ""
 }
 
 variable "google_client_secret" {
-  description = "Google OAuth Client Secret"
+  description = "Google OAuth Client Secret (deprecated - not used, kept for backward compatibility)"
   type        = string
   sensitive   = true
+  default     = ""
 }
 
 variable "allowed_origins" {
