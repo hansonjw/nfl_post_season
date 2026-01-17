@@ -21,6 +21,7 @@
         "iam:AttachRolePolicy",
         "iam:DetachRolePolicy",
         "iam:ListAttachedRolePolicies",
+        "iam:GetRole",
         "iam:PassRole",
         "cognito-idp:*",
         "cognito-identity:*"

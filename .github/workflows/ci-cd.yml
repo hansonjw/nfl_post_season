@@ -140,6 +140,7 @@ jobs:
           ORIGINS="${{ secrets.ALLOWED_ORIGINS || '*' }}"
           ORIGINS_LIST=$(echo "$ORIGINS" | awk -F',' '{for(i=1;i<=NF;i++) printf "\"%s\"%s", $i, (i<NF?",":"")}')
           cat > terraform.tfvars <<EOF
+          aws_region = "${{ env.AWS_REGION }}"
           admin_emails = ["${{ secrets.ADMIN_EMAIL || 'admin@example.com' }}"]
           google_client_id = "${{ secrets.GOOGLE_CLIENT_ID || '' }}"
           google_client_secret = "${{ secrets.GOOGLE_CLIENT_SECRET || '' }}"
