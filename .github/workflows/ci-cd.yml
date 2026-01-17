@@ -62,7 +62,9 @@ jobs:
           cache-dependency-path: package-lock.json
       
       - name: Install dependencies
-        run: npm ci
+        run: |
+          # Use npm install to ensure optional dependencies (like Rollup's native binaries) are installed
+          npm install
       
       - name: Run linter
         run: npm run lint || true  # Don't fail on lint warnings
@@ -177,7 +179,10 @@ jobs:
           cache-dependency-path: package-lock.json
       
       - name: Install Frontend Dependencies
-        run: npm ci
+        run: |
+          # npm ci can miss optional dependencies (like Rollup's native binaries)
+          # Use npm install to ensure all optional dependencies are installed
+          npm install
       
       - name: Build Frontend
         run: npm run build
