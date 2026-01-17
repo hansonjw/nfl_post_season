@@ -6,7 +6,7 @@ resource "aws_lambda_function" "read_api" {
   handler          = "read-api/index.handler"
   runtime          = "nodejs20.x"
   timeout          = 30
-  source_code_hash = filebase64sha256("${path.module}/../lambda/read-api/dist/index.zip")
+  source_code_hash = fileexists("${path.module}/../lambda/read-api/dist/index.zip") ? filebase64sha256("${path.module}/../lambda/read-api/dist/index.zip") : null
 
   environment {
     variables = {
@@ -29,7 +29,7 @@ resource "aws_lambda_function" "admin_api" {
   handler          = "admin-api/index.handler"
   runtime          = "nodejs20.x"
   timeout          = 30
-  source_code_hash = filebase64sha256("${path.module}/../lambda/admin-api/dist/index.zip")
+  source_code_hash = fileexists("${path.module}/../lambda/admin-api/dist/index.zip") ? filebase64sha256("${path.module}/../lambda/admin-api/dist/index.zip") : null
 
   environment {
     variables = {
