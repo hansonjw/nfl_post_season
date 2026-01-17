@@ -1,3 +1,17 @@
+# Locals for conditional depends_on
+locals {
+  # Build list of write integrations that exist when enable_write_endpoints = true
+  write_integrations = var.enable_write_endpoints ? [
+    aws_api_gateway_integration.players_post[0],
+    aws_api_gateway_integration.players_put[0],
+    aws_api_gateway_integration.players_delete[0],
+    aws_api_gateway_integration.games_post[0],
+    aws_api_gateway_integration.games_put[0],
+    aws_api_gateway_integration.picks_post[0],
+    aws_api_gateway_integration.picks_put[0],
+  ] : []
+}
+
 # API Gateway REST API
 resource "aws_api_gateway_rest_api" "main" {
   name        = "${var.project_name}_api"
@@ -102,59 +116,65 @@ resource "aws_api_gateway_integration" "players_get" {
   uri                     = aws_lambda_function.read_api.invoke_arn
 }
 
-# Players POST (admin-api, DISABLED for production)
-# resource "aws_api_gateway_method" "players_post" {
-#   rest_api_id   = aws_api_gateway_rest_api.main.id
-#   resource_id   = aws_api_gateway_resource.players.id
-#   http_method   = "POST"
-#   authorization = "NONE"
-# }
+# Players POST (admin-api, conditionally enabled via enable_write_endpoints variable)
+resource "aws_api_gateway_method" "players_post" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.players.id
+  http_method = "POST"
+  authorization = "NONE"
+}
 
-# resource "aws_api_gateway_integration" "players_post" {
-#   rest_api_id = aws_api_gateway_rest_api.main.id
-#   resource_id = aws_api_gateway_resource.players.id
-#   http_method = aws_api_gateway_method.players_post.http_method
-#
-#   integration_http_method = "POST"
-#   type                    = "AWS_PROXY"
-#   uri                     = aws_lambda_function.admin_api.invoke_arn
-# }
+resource "aws_api_gateway_integration" "players_post" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.players.id
+  http_method = aws_api_gateway_method.players_post[0].http_method
 
-# Players PUT (admin-api, DISABLED for production) - on {id} resource
-# resource "aws_api_gateway_method" "players_put" {
-#   rest_api_id   = aws_api_gateway_rest_api.main.id
-#   resource_id   = aws_api_gateway_resource.players_id.id
-#   http_method   = "PUT"
-#   authorization = "NONE"
-# }
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.admin_api.invoke_arn
+}
 
-# resource "aws_api_gateway_integration" "players_put" {
-#   rest_api_id = aws_api_gateway_rest_api.main.id
-#   resource_id = aws_api_gateway_resource.players_id.id
-#   http_method = aws_api_gateway_method.players_put.http_method
-#
-#   integration_http_method = "POST"
-#   type                    = "AWS_PROXY"
-#   uri                     = aws_lambda_function.admin_api.invoke_arn
-# }
+# Players PUT (admin-api, conditionally enabled) - on {id} resource
+resource "aws_api_gateway_method" "players_put" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.players_id.id
+  http_method = "PUT"
+  authorization = "NONE"
+}
 
-# Players DELETE (admin-api, DISABLED for production) - on {id} resource
-# resource "aws_api_gateway_method" "players_delete" {
-#   rest_api_id   = aws_api_gateway_rest_api.main.id
-#   resource_id   = aws_api_gateway_resource.players_id.id
-#   http_method   = "DELETE"
-#   authorization = "NONE"
-# }
+resource "aws_api_gateway_integration" "players_put" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.players_id.id
+  http_method = aws_api_gateway_method.players_put[0].http_method
 
-# resource "aws_api_gateway_integration" "players_delete" {
-#   rest_api_id = aws_api_gateway_rest_api.main.id
-#   resource_id = aws_api_gateway_resource.players_id.id
-#   http_method = aws_api_gateway_method.players_delete.http_method
-#
-#   integration_http_method = "POST"
-#   type                    = "AWS_PROXY"
-#   uri                     = aws_lambda_function.admin_api.invoke_arn
-# }
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.admin_api.invoke_arn
+}
+
+# Players DELETE (admin-api, conditionally enabled) - on {id} resource
+resource "aws_api_gateway_method" "players_delete" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.players_id.id
+  http_method = "DELETE"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "players_delete" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.players_id.id
+  http_method = aws_api_gateway_method.players_delete[0].http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.admin_api.invoke_arn
+}
 
 # Games GET (read-api, no auth)
 resource "aws_api_gateway_method" "games_get" {
@@ -174,41 +194,45 @@ resource "aws_api_gateway_integration" "games_get" {
   uri                     = aws_lambda_function.read_api.invoke_arn
 }
 
-# Games POST (admin-api, DISABLED for production)
-# resource "aws_api_gateway_method" "games_post" {
-#   rest_api_id   = aws_api_gateway_rest_api.main.id
-#   resource_id   = aws_api_gateway_resource.games.id
-#   http_method   = "POST"
-#   authorization = "NONE"
-# }
+# Games POST (admin-api, conditionally enabled)
+resource "aws_api_gateway_method" "games_post" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.games.id
+  http_method = "POST"
+  authorization = "NONE"
+}
 
-# resource "aws_api_gateway_integration" "games_post" {
-#   rest_api_id = aws_api_gateway_rest_api.main.id
-#   resource_id = aws_api_gateway_resource.games.id
-#   http_method = aws_api_gateway_method.games_post.http_method
-#
-#   integration_http_method = "POST"
-#   type                    = "AWS_PROXY"
-#   uri                     = aws_lambda_function.admin_api.invoke_arn
-# }
+resource "aws_api_gateway_integration" "games_post" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.games.id
+  http_method = aws_api_gateway_method.games_post[0].http_method
 
-# Games PUT (admin-api, DISABLED for production) - on {id} resource
-# resource "aws_api_gateway_method" "games_put" {
-#   rest_api_id   = aws_api_gateway_rest_api.main.id
-#   resource_id   = aws_api_gateway_resource.games_id.id
-#   http_method   = "PUT"
-#   authorization = "NONE"
-# }
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.admin_api.invoke_arn
+}
 
-# resource "aws_api_gateway_integration" "games_put" {
-#   rest_api_id = aws_api_gateway_rest_api.main.id
-#   resource_id = aws_api_gateway_resource.games_id.id
-#   http_method = aws_api_gateway_method.games_put.http_method
-#
-#   integration_http_method = "POST"
-#   type                    = "AWS_PROXY"
-#   uri                     = aws_lambda_function.admin_api.invoke_arn
-# }
+# Games PUT (admin-api, conditionally enabled) - on {id} resource
+resource "aws_api_gateway_method" "games_put" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.games_id.id
+  http_method = "PUT"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "games_put" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.games_id.id
+  http_method = aws_api_gateway_method.games_put[0].http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.admin_api.invoke_arn
+}
 
 # Picks GET (read-api, no auth)
 resource "aws_api_gateway_method" "picks_get" {
@@ -228,41 +252,45 @@ resource "aws_api_gateway_integration" "picks_get" {
   uri                     = aws_lambda_function.read_api.invoke_arn
 }
 
-# Picks POST (admin-api, DISABLED for production)
-# resource "aws_api_gateway_method" "picks_post" {
-#   rest_api_id   = aws_api_gateway_rest_api.main.id
-#   resource_id   = aws_api_gateway_resource.picks.id
-#   http_method   = "POST"
-#   authorization = "NONE"
-# }
+# Picks POST (admin-api, conditionally enabled)
+resource "aws_api_gateway_method" "picks_post" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.picks.id
+  http_method = "POST"
+  authorization = "NONE"
+}
 
-# resource "aws_api_gateway_integration" "picks_post" {
-#   rest_api_id = aws_api_gateway_rest_api.main.id
-#   resource_id = aws_api_gateway_resource.picks.id
-#   http_method = aws_api_gateway_method.picks_post.http_method
-#
-#   integration_http_method = "POST"
-#   type                    = "AWS_PROXY"
-#   uri                     = aws_lambda_function.admin_api.invoke_arn
-# }
+resource "aws_api_gateway_integration" "picks_post" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.picks.id
+  http_method = aws_api_gateway_method.picks_post[0].http_method
 
-# Picks PUT (admin-api, DISABLED for production) - on {id} resource
-# resource "aws_api_gateway_method" "picks_put" {
-#   rest_api_id   = aws_api_gateway_rest_api.main.id
-#   resource_id   = aws_api_gateway_resource.picks_id.id
-#   http_method   = "PUT"
-#   authorization = "NONE"
-# }
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.admin_api.invoke_arn
+}
 
-# resource "aws_api_gateway_integration" "picks_put" {
-#   rest_api_id = aws_api_gateway_rest_api.main.id
-#   resource_id = aws_api_gateway_resource.picks_id.id
-#   http_method = aws_api_gateway_method.picks_put.http_method
-#
-#   integration_http_method = "POST"
-#   type                    = "AWS_PROXY"
-#   uri                     = aws_lambda_function.admin_api.invoke_arn
-# }
+# Picks PUT (admin-api, conditionally enabled) - on {id} resource
+resource "aws_api_gateway_method" "picks_put" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.picks_id.id
+  http_method = "PUT"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_integration" "picks_put" {
+  count       = var.enable_write_endpoints ? 1 : 0
+  rest_api_id = aws_api_gateway_rest_api.main.id
+  resource_id = aws_api_gateway_resource.picks_id.id
+  http_method = aws_api_gateway_method.picks_put[0].http_method
+
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.admin_api.invoke_arn
+}
 
 # Scoreboard GET (read-api, no auth)
 resource "aws_api_gateway_method" "scoreboard_get" {
@@ -656,7 +684,7 @@ resource "aws_api_gateway_deployment" "main" {
   rest_api_id = aws_api_gateway_rest_api.main.id
 
   triggers = {
-    redeployment = sha1(jsonencode([
+    redeployment = sha1(jsonencode(compact([
       aws_api_gateway_resource.players.id,
       aws_api_gateway_resource.players_id.id,
       aws_api_gateway_resource.games.id,
@@ -671,36 +699,43 @@ resource "aws_api_gateway_deployment" "main" {
       aws_api_gateway_method.picks_options.id,
       aws_api_gateway_method.picks_id_options.id,
       aws_api_gateway_method.scoreboard_options.id,
+      aws_api_gateway_integration.players_id_options.id,
+      aws_api_gateway_integration.games_id_options.id,
+      aws_api_gateway_integration.picks_id_options.id,
+      # Conditionally include write methods/integrations when enabled
+      var.enable_write_endpoints ? try(aws_api_gateway_integration.players_post[0].id, null) : null,
+      var.enable_write_endpoints ? try(aws_api_gateway_integration.players_put[0].id, null) : null,
+      var.enable_write_endpoints ? try(aws_api_gateway_integration.players_delete[0].id, null) : null,
+      var.enable_write_endpoints ? try(aws_api_gateway_integration.games_post[0].id, null) : null,
+      var.enable_write_endpoints ? try(aws_api_gateway_integration.games_put[0].id, null) : null,
+      var.enable_write_endpoints ? try(aws_api_gateway_integration.picks_post[0].id, null) : null,
+      var.enable_write_endpoints ? try(aws_api_gateway_integration.picks_put[0].id, null) : null,
       aws_api_gateway_authorizer.cognito.id,
       timestamp(),
-    ]))
+      "force-deploy-v2",  # Force new deployment
+    ])))
   }
 
   lifecycle {
     create_before_destroy = true
   }
 
+  # Wait for all integrations to be created before deploying
+  # Note: Conditional write integrations are included implicitly via their dependencies
+  # When count=0, Terraform will skip the dependency gracefully
   depends_on = [
     aws_api_gateway_method.players_get,
-    # aws_api_gateway_method.players_post,  # DISABLED
-    # aws_api_gateway_method.players_put,   # DISABLED
     aws_api_gateway_method.players_options,
     aws_api_gateway_method.players_id_options,
     aws_api_gateway_method.games_get,
-    # aws_api_gateway_method.games_post,    # DISABLED
-    # aws_api_gateway_method.games_put,     # DISABLED
     aws_api_gateway_method.games_options,
     aws_api_gateway_method.games_id_options,
     aws_api_gateway_method.picks_get,
-    # aws_api_gateway_method.picks_post,    # DISABLED
-    # aws_api_gateway_method.picks_put,     # DISABLED
     aws_api_gateway_method.picks_options,
     aws_api_gateway_method.picks_id_options,
     aws_api_gateway_method.scoreboard_get,
     aws_api_gateway_method.scoreboard_options,
     aws_api_gateway_integration.players_get,
-    # aws_api_gateway_integration.players_post,  # DISABLED
-    # aws_api_gateway_integration.players_put,   # DISABLED
     aws_api_gateway_integration.players_options,
     aws_api_gateway_method_response.players_options,
     aws_api_gateway_integration_response.players_options,
@@ -708,8 +743,6 @@ resource "aws_api_gateway_deployment" "main" {
     aws_api_gateway_method_response.players_id_options,
     aws_api_gateway_integration_response.players_id_options,
     aws_api_gateway_integration.games_get,
-    # aws_api_gateway_integration.games_post,    # DISABLED
-    # aws_api_gateway_integration.games_put,     # DISABLED
     aws_api_gateway_integration.games_options,
     aws_api_gateway_method_response.games_options,
     aws_api_gateway_integration_response.games_options,
@@ -717,8 +750,6 @@ resource "aws_api_gateway_deployment" "main" {
     aws_api_gateway_method_response.games_id_options,
     aws_api_gateway_integration_response.games_id_options,
     aws_api_gateway_integration.picks_get,
-    # aws_api_gateway_integration.picks_post,    # DISABLED
-    # aws_api_gateway_integration.picks_put,     # DISABLED
     aws_api_gateway_integration.picks_options,
     aws_api_gateway_method_response.picks_options,
     aws_api_gateway_integration_response.picks_options,
@@ -729,6 +760,9 @@ resource "aws_api_gateway_deployment" "main" {
     aws_api_gateway_integration.scoreboard_options,
     aws_api_gateway_method_response.scoreboard_options,
     aws_api_gateway_integration_response.scoreboard_options,
+    # Conditional write integrations (only exist when enable_write_endpoints = true)
+    # Terraform will handle these gracefully - they're already implicitly depended on
+    # via their parent methods, but we list them here to be explicit
   ]
 }
 

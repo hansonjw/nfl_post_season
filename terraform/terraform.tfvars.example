@@ -16,3 +16,8 @@ allowed_origins = [
   "https://your-domain.com"
 ]
 
+# Enable write endpoints for local development (set to false for production)
+enable_write_endpoints = false
+
+# Admin passkey for write operations (required if enable_write_endpoints is true)
+admin_passkey = "your-secret-passkey-here"

@@ -36,3 +36,15 @@ variable "allowed_origins" {
   default     = ["*"] # Update this to your frontend domain
 }
 
+variable "enable_write_endpoints" {
+  description = "Enable POST, PUT, DELETE endpoints for admin operations (set to true for local development)"
+  type        = bool
+  default     = false # Disabled by default for production
+}
+
+variable "admin_passkey" {
+  description = "Admin passkey for write operations (required if enable_write_endpoints is true). Set this in terraform.tfvars or via -var flag."
+  type        = string
+  sensitive   = true
+  default     = "" # Set this in terraform.tfvars or via -var flag
+}

@@ -37,6 +37,7 @@ resource "aws_lambda_function" "admin_api" {
       GAMES_TABLE   = aws_dynamodb_table.games.name
       PICKS_TABLE   = aws_dynamodb_table.picks.name
       ADMIN_EMAILS  = join(",", var.admin_emails)
+      ADMIN_PASSKEY = var.admin_passkey
     }
   }
 
