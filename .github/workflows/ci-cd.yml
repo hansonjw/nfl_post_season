@@ -175,14 +175,27 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
+          # Don't cache npm - we need a fresh install for platform-specific binaries
       
       - name: Install Frontend Dependencies
         run: |
-          # npm ci can miss optional dependencies (like Rollup's native binaries)
-          # Use npm install to ensure all optional dependencies are installed
+          # Clear npm cache to avoid macOS-specific cached packages
+          npm cache clean --force
+          # Clean install to ensure platform-specific optional dependencies are installed
+          rm -rf node_modules
+          # Temporarily move package-lock.json to force npm to resolve platform-specific optional deps
+          # This is necessary because the lock file was likely generated on macOS
+          mv package-lock.json package-lock.json.bak || true
+          # Install dependencies fresh - npm will generate platform-specific lock entries
           npm install
+          # Restore the original lock file (we don't want to commit Linux-specific lock file)
+          mv package-lock.json.bak package-lock.json || true
+          # Verify Rollup binary is installed
+          if [ ! -d "node_modules/@rollup/rollup-linux-x64-gnu" ]; then
+            echo "ERROR: Rollup Linux binary still missing!"
+            exit 1
+          fi
+          echo "✓ Rollup Linux binary installed successfully"
       
       - name: Build Frontend
         run: npm run build

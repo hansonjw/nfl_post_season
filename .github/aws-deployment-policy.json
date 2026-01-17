@@ -21,10 +21,15 @@
         "iam:AttachRolePolicy",
         "iam:DetachRolePolicy",
         "iam:ListAttachedRolePolicies",
-        "iam:GetRole",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:TagRole",
+        "iam:UntagRole",
+        "iam:ListRoleTags",
         "iam:PassRole",
+        "iam:GetRolePolicyList",
         "cognito-idp:*",
-        "cognito-identity:*"
+        "cognito-identity:*",
+        "sts:GetCallerIdentity"
       ],
       "Resource": "*"
     }
