@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { fetchScoreboard, fetchPlayers } from '../api/client';
-import type { PlayerScore, Player } from '../types';
+import { fetchScoreboard, fetchPlayers, fetchGames, fetchPicks } from '../api/client';
+import type { PlayerScore, Player, Game, Pick } from '../types';
+import { getTeamLogo } from '../utils/teams';
 import './Scoreboard.css';
 
 export function Scoreboard() {
   const [scores, setScores] = useState<PlayerScore[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [games, setGames] = useState<Game[]>([]);
+  const [picks, setPicks] = useState<Pick[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -14,12 +17,16 @@ export function Scoreboard() {
       try {
         setLoading(true);
         setError(null);
-        const [scoresData, playersData] = await Promise.all([
+        const [scoresData, playersData, gamesData, picksData] = await Promise.all([
           fetchScoreboard(),
           fetchPlayers(),
+          fetchGames(),
+          fetchPicks(),
         ]);
         setScores(scoresData);
         setPlayers(playersData);
+        setGames(gamesData);
+        setPicks(picksData);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load scoreboard');
         console.error('Error loading scoreboard:', err);
@@ -60,6 +67,28 @@ export function Scoreboard() {
     );
   }
 
+  // Get completed games with both teams set (for showing picks)
+  const gamesWithPicks = games
+    .filter(game => game.homeTeam && game.awayTeam)
+    .sort((a, b) => {
+      // Sort by round, then week
+      const roundOrder = ['Wild Card', 'Divisional', 'Conference', 'Super Bowl'];
+      const roundDiff = roundOrder.indexOf(a.round) - roundOrder.indexOf(b.round);
+      if (roundDiff !== 0) return roundDiff;
+      return (a.week || 0) - (b.week || 0);
+    });
+
+  // Helper function to get matchup abbreviation
+  const getMatchupAbbr = (game: Game): string => {
+    if (!game.homeTeam || !game.awayTeam) return '';
+    return `${game.awayTeam}v${game.homeTeam}`;
+  };
+
+  // Helper function to get player's pick for a game
+  const getPlayerPick = (playerId: string, gameId: string): Pick | undefined => {
+    return picks.find(p => p.playerId === playerId && p.gameId === gameId);
+  };
+
   return (
     <div className="scoreboard">
       <div className="scoreboard-table-container">
@@ -71,6 +100,11 @@ export function Scoreboard() {
               <th className="correct-col">Wins</th>
               <th className="total-col">Games</th>
               <th className="percentage-col">Win %</th>
+              {gamesWithPicks.map(game => (
+                <th key={game.id} className="pick-col">
+                  {getMatchupAbbr(game)}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -101,6 +135,39 @@ export function Scoreboard() {
                   <td className="percentage-col">
                     <span className="percentage-value">{score.percentage}%</span>
                   </td>
+                  {gamesWithPicks.map(game => {
+                    const pick = getPlayerPick(score.playerId, game.id);
+                    if (!pick || !pick.pickedTeam) {
+                      return (
+                        <td key={game.id} className="pick-col">
+                          <span className="pick-logo-empty">—</span>
+                        </td>
+                      );
+                    }
+                    const isCorrect = pick.isCorrect === true;
+                    const isIncorrect = pick.isCorrect === false;
+                    const isPending = game.completed !== true;
+                    
+                    let pickClass = '';
+                    if (isPending) {
+                      pickClass = 'pick-pending';
+                    } else if (isCorrect) {
+                      pickClass = 'pick-correct';
+                    } else if (isIncorrect) {
+                      pickClass = 'pick-incorrect';
+                    }
+                    
+                    return (
+                      <td key={game.id} className={`pick-col ${pickClass}`}>
+                        <img
+                          src={getTeamLogo(pick.pickedTeam)}
+                          alt={pick.pickedTeam}
+                          className="pick-logo"
+                          title={pick.pickedTeam}
+                        />
+                      </td>
+                    );
+                  })}
                 </tr>
               );
             })}

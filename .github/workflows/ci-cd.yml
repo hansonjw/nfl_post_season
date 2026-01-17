@@ -147,6 +147,8 @@ jobs:
           google_client_id = "${{ secrets.GOOGLE_CLIENT_ID || '' }}"
           google_client_secret = "${{ secrets.GOOGLE_CLIENT_SECRET || '' }}"
           allowed_origins = [$ORIGINS_LIST]
+          enable_write_endpoints = ${{ secrets.ENABLE_WRITE_ENDPOINTS || 'false' }}
+          admin_passkey = "${{ secrets.ADMIN_PASSKEY || '' }}"
           EOF
       
       - name: Terraform Plan

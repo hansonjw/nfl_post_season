@@ -10,10 +10,23 @@ export function AdminPlayers() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [formData, setFormData] = useState({ name: '', color: '#FF5733' });
+  const [passkey, setPasskey] = useState(() => {
+    // Load passkey from localStorage on mount
+    return localStorage.getItem('admin_passkey') || '';
+  });
 
   useEffect(() => {
     loadPlayers();
   }, []);
+
+  // Save passkey to localStorage when it changes
+  useEffect(() => {
+    if (passkey) {
+      localStorage.setItem('admin_passkey', passkey);
+    } else {
+      localStorage.removeItem('admin_passkey');
+    }
+  }, [passkey]);
 
   async function loadPlayers() {
     try {
@@ -30,33 +43,45 @@ export function AdminPlayers() {
   }
 
   async function handleSave(playerId?: string) {
+    if (!passkey) {
+      setError('Passkey is required to save changes');
+      return;
+    }
     try {
       if (playerId) {
         // Update existing player
-        await updatePlayer(playerId, formData);
+        await updatePlayer(playerId, formData, passkey);
       } else {
         // Create new player
-        await createPlayer(formData.name, formData.color);
+        await createPlayer(formData.name, formData.color, passkey);
       }
       await loadPlayers();
       setEditingId(null);
       setShowAddForm(false);
       setFormData({ name: '', color: '#FF5733' });
+      setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save player');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save player';
+      setError(errorMessage);
       console.error('Error saving player:', err);
     }
   }
 
   async function handleDelete(playerId: string) {
+    if (!passkey) {
+      setError('Passkey is required to delete');
+      return;
+    }
     if (!confirm('Are you sure you want to delete this player?')) {
       return;
     }
     try {
-      await deletePlayer(playerId);
+      await deletePlayer(playerId, passkey);
       await loadPlayers();
+      setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete player');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete player';
+      setError(errorMessage);
       console.error('Error deleting player:', err);
     }
   }
@@ -104,6 +129,28 @@ export function AdminPlayers() {
         >
           + Add Player
         </button>
+      </div>
+
+      <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#2a2a2a', borderRadius: '8px' }}>
+        <label style={{ display: 'block', marginBottom: '8px', color: '#fff' }}>
+          Admin Passkey:
+          <input
+            type="password"
+            value={passkey}
+            onChange={(e) => setPasskey(e.target.value)}
+            placeholder="Enter passkey to save changes"
+            style={{
+              marginLeft: '10px',
+              padding: '8px',
+              fontSize: '14px',
+              width: '200px',
+              backgroundColor: '#1a1a1a',
+              color: '#fff',
+              border: '1px solid #555',
+              borderRadius: '4px'
+            }}
+          />
+        </label>
       </div>
 
       {showAddForm && (

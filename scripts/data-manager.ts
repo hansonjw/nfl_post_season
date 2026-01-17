@@ -83,6 +83,20 @@ async function downloadData(outputDir: string = './data-export'): Promise<void> 
   } while (lastEvaluatedKey);
   console.log(`   ✅ Downloaded ${data.picks.length} picks`);
 
+  // Create player ID to name map for enriching picks
+  const playerNameMap = new Map<string, string>();
+  for (const player of data.players) {
+    if (player.id && player.name) {
+      playerNameMap.set(player.id, player.name);
+    }
+  }
+
+  // Enrich picks with player names (for display only, not part of data model)
+  const enrichedPicks = data.picks.map(pick => ({
+    ...pick,
+    playerName: playerNameMap.get(pick.playerId) || 'Unknown Player',
+  }));
+
   // Write to JSON files
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
   const playersFile = join(outputDir, `players-${timestamp}.json`);
@@ -91,7 +105,7 @@ async function downloadData(outputDir: string = './data-export'): Promise<void> 
 
   await writeFile(playersFile, JSON.stringify(data.players, null, 2));
   await writeFile(gamesFile, JSON.stringify(data.games, null, 2));
-  await writeFile(picksFile, JSON.stringify(data.picks, null, 2));
+  await writeFile(picksFile, JSON.stringify(enrichedPicks, null, 2));
 
   console.log('\n✨ Download complete!');
   console.log(`   📁 Output directory: ${outputDir}`);
@@ -190,6 +204,11 @@ async function uploadData(dataDir: string = './data-export'): Promise<void> {
     const gameIds = new Set(data.games?.map(g => g.id) || []);
     
     for (const pick of data.picks) {
+      // Strip playerName if present (it's only for display in JSON, not part of data model)
+      if ('playerName' in pick) {
+        delete pick.playerName;
+      }
+      
       if (!pick.id || typeof pick.id !== 'string' || pick.id.length < 10) {
         pick.id = randomUUID();
         fixedCount++;

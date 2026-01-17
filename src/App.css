@@ -68,6 +68,37 @@
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
+  box-sizing: border-box;
+}
+
+/* iPhone and small mobile devices (max-width: 428px) */
+@media (max-width: 428px) {
+  .app-header {
+    padding: 1rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .app-header p {
+    font-size: 0.9rem;
+  }
+
+  .app-nav {
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .app-nav button {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.875rem;
+    min-width: 100px;
+  }
+
+  .app-main {
+    padding: 1rem 0.5rem;
+  }
 }
 
 .auth-login,

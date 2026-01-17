@@ -25,10 +25,23 @@ export function AdminGames() {
   const [creatingNew, setCreatingNew] = useState(false);
   const [formData, setFormData] = useState<EditingGame | null>(null);
   const [playerPicks, setPlayerPicks] = useState<Record<string, TeamAbbreviation | ''>>({});
+  const [passkey, setPasskey] = useState(() => {
+    // Load passkey from localStorage on mount
+    return localStorage.getItem('admin_passkey') || '';
+  });
 
   useEffect(() => {
     loadData();
   }, []);
+
+  // Save passkey to localStorage when it changes
+  useEffect(() => {
+    if (passkey) {
+      localStorage.setItem('admin_passkey', passkey);
+    } else {
+      localStorage.removeItem('admin_passkey');
+    }
+  }, [passkey]);
 
   async function loadData() {
     try {
@@ -91,6 +104,11 @@ export function AdminGames() {
   async function handleSave() {
     if (!formData) return;
 
+    if (!passkey) {
+      setError('Passkey is required to save changes');
+      return;
+    }
+
     try {
       if (creatingNew) {
         // Create new game
@@ -100,7 +118,7 @@ export function AdminGames() {
           homeTeam: formData.homeTeam,
           awayTeam: formData.awayTeam,
           conference: formData.conference,
-        });
+        }, passkey);
         
         const gameId = newGame.id;
         
@@ -118,7 +136,7 @@ export function AdminGames() {
         if (formData.winner) updates.winner = formData.winner;
         
         if (Object.keys(updates).length > 0) {
-          await updateGame(gameId, updates);
+          await updateGame(gameId, updates, passkey);
         }
         
         // Save picks for each player
@@ -130,7 +148,7 @@ export function AdminGames() {
                 playerId: player.id,
                 gameId: gameId,
                 pickedTeam: pickedTeam,
-              });
+              }, passkey);
             }
           });
           await Promise.all(pickPromises);
@@ -155,7 +173,7 @@ export function AdminGames() {
         if (formData.awayScore !== undefined) updates.awayScore = formData.awayScore;
         if (formData.winner) updates.winner = formData.winner;
 
-        await updateGame(editingId, updates);
+        await updateGame(editingId, updates, passkey);
         
         // Save picks for each player
         if (formData.homeTeam && formData.awayTeam) {
@@ -166,7 +184,7 @@ export function AdminGames() {
                 playerId: player.id,
                 gameId: editingId,
                 pickedTeam: pickedTeam,
-              });
+              }, passkey);
             }
           });
           await Promise.all(pickPromises);
@@ -178,8 +196,10 @@ export function AdminGames() {
       setCreatingNew(false);
       setFormData(null);
       setPlayerPicks({});
+      setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save game');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save game';
+      setError(errorMessage);
       console.error('Error saving game:', err);
     }
   }
@@ -236,6 +256,28 @@ export function AdminGames() {
             + Add Game
           </button>
         )}
+      </div>
+
+      <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#2a2a2a', borderRadius: '8px' }}>
+        <label style={{ display: 'block', marginBottom: '8px', color: '#fff' }}>
+          Admin Passkey:
+          <input
+            type="password"
+            value={passkey}
+            onChange={(e) => setPasskey(e.target.value)}
+            placeholder="Enter passkey to save changes"
+            style={{
+              marginLeft: '10px',
+              padding: '8px',
+              fontSize: '14px',
+              width: '200px',
+              backgroundColor: '#1a1a1a',
+              color: '#fff',
+              border: '1px solid #555',
+              borderRadius: '4px'
+            }}
+          />
+        </label>
       </div>
 
       {creatingNew && formData && (

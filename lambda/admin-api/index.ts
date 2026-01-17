@@ -5,10 +5,24 @@ import { createPick, updatePick } from './handlers/picks.js';
 import { createResponse, getEmailFromEvent } from '../shared/utils.js';
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || '').split(',').map((e) => e.trim());
+const ADMIN_PASSKEY = process.env.ADMIN_PASSKEY || '';
 
-function isAdmin(email: string | null): boolean {
-  if (!email) return false;
-  return ADMIN_EMAILS.includes(email);
+function validatePasskey(body: string | null): boolean {
+  if (!ADMIN_PASSKEY) {
+    console.warn('ADMIN_PASSKEY not set in environment - allowing all requests');
+    return true; // If no passkey is set, allow all requests (for development)
+  }
+  
+  if (!body) {
+    return false;
+  }
+  
+  try {
+    const parsed = JSON.parse(body);
+    return parsed.passkey === ADMIN_PASSKEY;
+  } catch {
+    return false;
+  }
 }
 
 export const handler = async (
@@ -31,11 +45,15 @@ export const handler = async (
     };
   }
 
-  // Admin authentication check removed - allowing unauthenticated access for now
-  // const email = getEmailFromEvent(event as any);
-  // if (!isAdmin(email)) {
-  //   return createResponse(403, { error: 'Forbidden: Admin access required' });
-  // }
+  // Validate passkey for write operations (POST, PUT, DELETE)
+  if (['POST', 'PUT', 'DELETE'].includes(httpMethod)) {
+    if (!validatePasskey(body)) {
+      return createResponse(403, { 
+        error: 'Passkey not accepted',
+        message: 'Invalid or missing passkey. Please provide a valid passkey to save changes.'
+      });
+    }
+  }
 
   // Normalize path (remove stage prefix like /prod if present, but keep resource paths)
   // API Gateway may pass path as /prod/players/{id} or /players/{id}

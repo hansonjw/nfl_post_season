@@ -1,0 +1,130 @@
+[
+  {
+    "week": 2,
+    "completed": false,
+    "round": "Divisional",
+    "homeTeam": "SEA",
+    "id": "5090796e-3268-48ed-b057-570069107ad6",
+    "conference": "NFC",
+    "awayTeam": "SF"
+  },
+  {
+    "week": 1,
+    "completed": true,
+    "winner": "NE",
+    "round": "Wild Card",
+    "homeTeam": "NE",
+    "awayScore": 3,
+    "homeScore": 16,
+    "id": "645de025-67a1-47c9-8a47-081a3329f744",
+    "conference": "AFC",
+    "awayTeam": "LAC"
+  },
+  {
+    "week": 1,
+    "completed": true,
+    "winner": "CHI",
+    "round": "Wild Card",
+    "homeTeam": "CHI",
+    "awayScore": 27,
+    "homeScore": 31,
+    "id": "67d9c65d-b14d-40ca-abff-090916fd56ed",
+    "conference": "NFC",
+    "awayTeam": "GB"
+  },
+  {
+    "week": 1,
+    "completed": true,
+    "winner": "LAR",
+    "round": "Wild Card",
+    "homeTeam": "CAR",
+    "awayScore": 34,
+    "homeScore": 31,
+    "id": "3d39f8a9-853d-4889-bea4-d755e6e1011d",
+    "conference": "NFC",
+    "awayTeam": "LAR"
+  },
+  {
+    "week": 3,
+    "completed": false,
+    "round": "Conference",
+    "id": "c7bf7f48-4eb6-4f5a-9e3e-9a2d9c9895fb",
+    "conference": "AFC"
+  },
+  {
+    "week": 1,
+    "completed": true,
+    "winner": "HOU",
+    "round": "Wild Card",
+    "homeTeam": "PIT",
+    "awayScore": 30,
+    "homeScore": 6,
+    "id": "51f4cd2a-2f41-4a65-b7e7-ee60b7cf6b8d",
+    "conference": "AFC",
+    "awayTeam": "HOU"
+  },
+  {
+    "week": 1,
+    "completed": true,
+    "winner": "SF",
+    "round": "Wild Card",
+    "homeTeam": "PHI",
+    "awayScore": 23,
+    "homeScore": 19,
+    "id": "cc636a79-7a71-4476-8e03-275b2a6e21c2",
+    "conference": "NFC",
+    "awayTeam": "SF"
+  },
+  {
+    "week": 4,
+    "completed": false,
+    "round": "Super Bowl",
+    "id": "f8223dab-c9ad-4bdd-af00-5cf1ec104dfb"
+  },
+  {
+    "week": 2,
+    "completed": false,
+    "round": "Divisional",
+    "homeTeam": "NE",
+    "id": "ebdac88b-3b3a-4049-84bc-70995efd52ad",
+    "conference": "AFC",
+    "awayTeam": "HOU"
+  },
+  {
+    "week": 3,
+    "completed": false,
+    "round": "Conference",
+    "id": "0ae97302-824d-4ae0-bd2b-fd1b5ab1f55b",
+    "conference": "NFC"
+  },
+  {
+    "week": 1,
+    "completed": false,
+    "round": "Divisional",
+    "homeTeam": "DEN",
+    "id": "a29b56bb-2010-46c4-80c8-a42cd8fb4fa9",
+    "conference": "AFC",
+    "awayTeam": "BUF"
+  },
+  {
+    "week": 1,
+    "completed": false,
+    "round": "Divisional",
+    "homeTeam": "CHI",
+    "id": "2dbb4466-fce1-467b-97d9-51194f50edde",
+    "conference": "NFC",
+    "awayTeam": "LAR"
+  },
+  {
+    "week": 1,
+    "completed": true,
+    "winner": "BUF",
+    "round": "Wild Card",
+    "homeTeam": "JAX",
+    "awayScore": 27,
+    "homeScore": 24,
+    "id": "742d745f-57fb-468c-bc1e-261bb6f1033d",
+    "conference": "AFC",
+    "awayTeam": "BUF"
+  }
+]

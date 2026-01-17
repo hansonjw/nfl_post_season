@@ -82,26 +82,27 @@ export async function fetchPicks(playerId?: string, gameId?: string) {
   return data.picks;
 }
 
-// Admin endpoints (no auth required for now)
-export async function createPlayer(name: string, color?: string) {
+// Admin endpoints (require passkey)
+export async function createPlayer(name: string, color?: string, passkey?: string) {
   const data = await apiRequest<{ player: any }>('/players', {
     method: 'POST',
-    body: JSON.stringify({ name, color }),
+    body: JSON.stringify({ name, color, passkey }),
   });
   return data.player;
 }
 
-export async function updatePlayer(playerId: string, updates: { name?: string; color?: string }) {
+export async function updatePlayer(playerId: string, updates: { name?: string; color?: string }, passkey?: string) {
   const data = await apiRequest<{ player: any }>(`/players/${playerId}`, {
     method: 'PUT',
-    body: JSON.stringify(updates),
+    body: JSON.stringify({ ...updates, passkey }),
   });
   return data.player;
 }
 
-export async function deletePlayer(playerId: string) {
+export async function deletePlayer(playerId: string, passkey?: string) {
   await apiRequest<{ success: boolean }>(`/players/${playerId}`, {
     method: 'DELETE',
+    body: JSON.stringify({ passkey }),
   });
 }
 
@@ -111,18 +112,18 @@ export async function createGame(game: {
   homeTeam?: string;
   awayTeam?: string;
   conference?: string;
-}) {
+}, passkey?: string) {
   const data = await apiRequest<{ game: any }>('/games', {
     method: 'POST',
-    body: JSON.stringify(game),
+    body: JSON.stringify({ ...game, passkey }),
   });
   return data.game;
 }
 
-export async function updateGame(gameId: string, updates: any) {
+export async function updateGame(gameId: string, updates: any, passkey?: string) {
   const data = await apiRequest<{ game: any }>(`/games/${gameId}`, {
     method: 'PUT',
-    body: JSON.stringify(updates),
+    body: JSON.stringify({ ...updates, passkey }),
   });
   return data.game;
 }
@@ -131,18 +132,18 @@ export async function createPick(pick: {
   playerId: string;
   gameId: string;
   pickedTeam: string;
-}) {
+}, passkey?: string) {
   const data = await apiRequest<{ pick: any }>('/picks', {
     method: 'POST',
-    body: JSON.stringify(pick),
+    body: JSON.stringify({ ...pick, passkey }),
   });
   return data.pick;
 }
 
-export async function updatePick(pickId: string, updates: any) {
+export async function updatePick(pickId: string, updates: any, passkey?: string) {
   const data = await apiRequest<{ pick: any }>(`/picks/${pickId}`, {
     method: 'PUT',
-    body: JSON.stringify(updates),
+    body: JSON.stringify({ ...updates, passkey }),
   });
   return data.pick;
 }
