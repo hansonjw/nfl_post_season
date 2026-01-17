@@ -1,10 +1,11 @@
 import { PutCommand, UpdateCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
+import type { APIGatewayProxyResult } from 'aws-lambda';
 import { docClient, TABLES } from '../../shared/dynamodb.js';
 import type { Pick, Game } from '../../shared/types.js';
 import { createResponse, parseBody } from '../../shared/utils.js';
 import { v4 as uuidv4 } from 'uuid';
 
-export async function createPick(body: string): Promise<any> {
+export async function createPick(body: string): Promise<APIGatewayProxyResult> {
   try {
     const data = parseBody<Omit<Pick, 'id' | 'isCorrect'>>(body);
     if (!data || !data.playerId || !data.gameId || !data.pickedTeam) {
@@ -76,7 +77,7 @@ export async function createPick(body: string): Promise<any> {
   }
 }
 
-export async function updatePick(pickId: string, body: string): Promise<any> {
+export async function updatePick(pickId: string, body: string): Promise<APIGatewayProxyResult> {
   try {
     const data = parseBody<Partial<Omit<Pick, 'id'>>>(body);
     if (!data) {
@@ -120,6 +121,8 @@ export async function updatePick(pickId: string, body: string): Promise<any> {
     }
 
     const setParts: string[] = [];
+    // DynamoDB attribute values can be string, number, boolean, null, lists, or maps
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const expressionAttributeValues: Record<string, any> = {};
 
     if (data.playerId !== undefined) {

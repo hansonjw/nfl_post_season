@@ -1,10 +1,11 @@
-import { PutCommand, UpdateCommand, GetCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { PutCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import type { APIGatewayProxyResult } from 'aws-lambda';
 import { docClient, TABLES } from '../../shared/dynamodb.js';
 import type { Game, Pick } from '../../shared/types.js';
 import { createResponse, parseBody } from '../../shared/utils.js';
 import { v4 as uuidv4 } from 'uuid';
 
-export async function createGame(body: string): Promise<any> {
+export async function createGame(body: string): Promise<APIGatewayProxyResult> {
   try {
     const data = parseBody<Omit<Game, 'id'>>(body);
     if (!data || !data.round) {
@@ -37,7 +38,7 @@ export async function createGame(body: string): Promise<any> {
   }
 }
 
-export async function updateGame(gameId: string, body: string): Promise<any> {
+export async function updateGame(gameId: string, body: string): Promise<APIGatewayProxyResult> {
   try {
     const data = parseBody<Partial<Omit<Game, 'id'>>>(body);
     if (!data) {
@@ -46,6 +47,8 @@ export async function updateGame(gameId: string, body: string): Promise<any> {
 
     const setParts: string[] = [];
     const removeParts: string[] = [];
+    // DynamoDB attribute values can be string, number, boolean, null, lists, or maps
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const expressionAttributeValues: Record<string, any> = {};
     const expressionAttributeNames: Record<string, string> = {};
 

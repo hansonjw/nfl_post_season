@@ -1,10 +1,11 @@
 import { PutCommand, UpdateCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import type { APIGatewayProxyResult } from 'aws-lambda';
 import { docClient, TABLES } from '../../shared/dynamodb.js';
 import type { Player } from '../../shared/types.js';
 import { createResponse, parseBody } from '../../shared/utils.js';
 import { v4 as uuidv4 } from 'uuid';
 
-export async function createPlayer(body: string): Promise<any> {
+export async function createPlayer(body: string): Promise<APIGatewayProxyResult> {
   try {
     const data = parseBody<Omit<Player, 'id'>>(body);
     if (!data || !data.name) {
@@ -30,7 +31,7 @@ export async function createPlayer(body: string): Promise<any> {
   }
 }
 
-export async function updatePlayer(playerId: string, body: string): Promise<any> {
+export async function updatePlayer(playerId: string, body: string): Promise<APIGatewayProxyResult> {
   try {
     const data = parseBody<Partial<Omit<Player, 'id'>>>(body);
     if (!data) {
@@ -38,6 +39,8 @@ export async function updatePlayer(playerId: string, body: string): Promise<any>
     }
 
     const updateParts: string[] = [];
+    // DynamoDB attribute values can be string, number, boolean, null, lists, or maps
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const expressionAttributeValues: Record<string, any> = {};
 
     if (data.name !== undefined) {
@@ -74,7 +77,7 @@ export async function updatePlayer(playerId: string, body: string): Promise<any>
   }
 }
 
-export async function deletePlayer(playerId: string): Promise<any> {
+export async function deletePlayer(playerId: string): Promise<APIGatewayProxyResult> {
   try {
     const command = new DeleteCommand({
       TableName: TABLES.PLAYERS,
