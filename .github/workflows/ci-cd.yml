@@ -147,9 +147,15 @@ jobs:
           EOF
       
       - name: Terraform Plan
+        id: terraform-plan
         run: |
           cd terraform
-          terraform plan -out=tfplan
+          # Plan with refresh - warnings about missing resources will cause them to be recreated
+          # Use refresh=false to skip refresh if there are state sync issues
+          terraform plan -refresh=true -out=tfplan 2>&1 | tee plan-output.log || {
+            echo "Plan failed, trying with refresh=false..."
+            terraform plan -refresh=false -out=tfplan
+          }
       
       - name: Terraform Apply
         if: github.event_name == 'push'
